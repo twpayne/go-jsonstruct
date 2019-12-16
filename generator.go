@@ -164,7 +164,7 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 	case distinctTypes == 1 && o.Array > 0:
 		fallthrough
 	case distinctTypes == 2 && o.Array > 0 && o.Null > 0:
-		elementGoType, _ := g.GoType(o.AllArrayElements, 0, imports)
+		elementGoType, _ := g.GoType(o.AllArrayElementValues, 0, imports)
 		return "[]" + elementGoType, o.Array+o.Null < observations
 	case distinctTypes == 1 && o.Bool > 0:
 		return "bool", o.Bool < observations
@@ -185,11 +185,11 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 	case distinctTypes == 1 && o.Object > 0:
 		fallthrough
 	case distinctTypes == 2 && o.Object > 0 && o.Null > 0:
-		if len(o.ObjectPropertyValues) == 0 {
+		if len(o.ObjectPropertyValue) == 0 {
 			return "struct{}", o.Object+o.Null < observations
 		}
 		hasUnparseableProperties := false
-		for k := range o.ObjectPropertyValues {
+		for k := range o.ObjectPropertyValue {
 			if strings.ContainsRune(k, ' ') {
 				hasUnparseableProperties = true
 				break
@@ -200,8 +200,8 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 			return "map[string]" + valueGoType, o.Object+o.Null < observations
 		}
 		b := &bytes.Buffer{}
-		properties := make([]string, 0, len(o.ObjectPropertyValues))
-		for k := range o.ObjectPropertyValues {
+		properties := make([]string, 0, len(o.ObjectPropertyValue))
+		for k := range o.ObjectPropertyValue {
 			properties = append(properties, k)
 		}
 		sort.Strings(properties)
@@ -212,7 +212,7 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 				unparseableProperties = append(unparseableProperties, k)
 				continue
 			}
-			goType, observedEmpty := g.GoType(o.ObjectPropertyValues[k], o.Object, imports)
+			goType, observedEmpty := g.GoType(o.ObjectPropertyValue[k], o.Object, imports)
 			var omitEmpty bool
 			switch {
 			case g.omitEmptyOption == OmitEmptyNever:

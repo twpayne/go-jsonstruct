@@ -23,9 +23,9 @@ func TestGoType(t *testing.T) {
 				[]interface{}{},
 			},
 			expectedObservedValue: &ObservedValue{
-				Observations:     1,
-				Array:            1,
-				AllArrayElements: &ObservedValue{},
+				Observations:          1,
+				Array:                 1,
+				AllArrayElementValues: &ObservedValue{},
 			},
 			expectedGoType: "[]interface{}",
 		},
@@ -39,7 +39,7 @@ func TestGoType(t *testing.T) {
 			expectedObservedValue: &ObservedValue{
 				Observations: 1,
 				Array:        1,
-				AllArrayElements: &ObservedValue{
+				AllArrayElementValues: &ObservedValue{
 					Observations: 1,
 					Bool:         1,
 				},
@@ -152,9 +152,9 @@ func TestGoType(t *testing.T) {
 				map[string]interface{}{},
 			},
 			expectedObservedValue: &ObservedValue{
-				Observations:         1,
-				Object:               1,
-				ObjectPropertyValues: map[string]*ObservedValue{},
+				Observations:        1,
+				Object:              1,
+				ObjectPropertyValue: map[string]*ObservedValue{},
 			},
 			expectedGoType: "struct{}",
 		},
@@ -165,10 +165,10 @@ func TestGoType(t *testing.T) {
 				nil,
 			},
 			expectedObservedValue: &ObservedValue{
-				Observations:         2,
-				Null:                 1,
-				Object:               1,
-				ObjectPropertyValues: map[string]*ObservedValue{},
+				Observations:        2,
+				Null:                1,
+				Object:              1,
+				ObjectPropertyValue: map[string]*ObservedValue{},
 			},
 			expectedGoType: "struct{}",
 		},
@@ -182,7 +182,7 @@ func TestGoType(t *testing.T) {
 			expectedObservedValue: &ObservedValue{
 				Observations: 1,
 				Object:       1,
-				ObjectPropertyValues: map[string]*ObservedValue{
+				ObjectPropertyValue: map[string]*ObservedValue{
 					"key": {
 						Observations: 1,
 						Bool:         1,
@@ -205,7 +205,7 @@ func TestGoType(t *testing.T) {
 			expectedObservedValue: &ObservedValue{
 				Observations: 1,
 				Object:       1,
-				ObjectPropertyValues: map[string]*ObservedValue{
+				ObjectPropertyValue: map[string]*ObservedValue{
 					"key with spaces": {
 						Observations: 1,
 						Bool:         1,
@@ -229,7 +229,7 @@ func TestGoType(t *testing.T) {
 			expectedObservedValue: &ObservedValue{
 				Observations: 1,
 				Object:       1,
-				ObjectPropertyValues: map[string]*ObservedValue{
+				ObjectPropertyValue: map[string]*ObservedValue{
 					"key with spaces": {
 						Observations: 1,
 						Bool:         1,
@@ -260,7 +260,7 @@ func TestGoType(t *testing.T) {
 			expectedObservedValue: &ObservedValue{
 				Observations: 1,
 				Object:       1,
-				ObjectPropertyValues: map[string]*ObservedValue{
+				ObjectPropertyValue: map[string]*ObservedValue{
 					"key with spaces": {
 						Observations: 1,
 						Bool:         1,
@@ -291,7 +291,7 @@ func TestGoType(t *testing.T) {
 			expectedObservedValue: &ObservedValue{
 				Observations: 1,
 				Object:       1,
-				ObjectPropertyValues: map[string]*ObservedValue{
+				ObjectPropertyValue: map[string]*ObservedValue{
 					"kebab-case": {
 						Observations: 1,
 						Bool:         1,
@@ -398,7 +398,7 @@ func TestGoType(t *testing.T) {
 			expectedObservedValue: &ObservedValue{
 				Observations: 1,
 				Object:       1,
-				ObjectPropertyValues: map[string]*ObservedValue{
+				ObjectPropertyValue: map[string]*ObservedValue{
 					"gpsAltitude": {
 						Observations: 1,
 						Int:          1,
@@ -428,7 +428,7 @@ func TestGoType(t *testing.T) {
 			expectedObservedValue: &ObservedValue{
 				Observations: 1,
 				Object:       1,
-				ObjectPropertyValues: map[string]*ObservedValue{
+				ObjectPropertyValue: map[string]*ObservedValue{
 					"key": {
 						Observations: 1,
 						Int:          1,
@@ -455,7 +455,7 @@ func TestGoType(t *testing.T) {
 			expectedObservedValue: &ObservedValue{
 				Observations: 2,
 				Object:       2,
-				ObjectPropertyValues: map[string]*ObservedValue{
+				ObjectPropertyValue: map[string]*ObservedValue{
 					"key": {
 						Observations: 1,
 						Int:          1,
@@ -485,7 +485,7 @@ func TestGoType(t *testing.T) {
 			expectedObservedValue: &ObservedValue{
 				Observations: 2,
 				Object:       2,
-				ObjectPropertyValues: map[string]*ObservedValue{
+				ObjectPropertyValue: map[string]*ObservedValue{
 					"key1": {
 						Observations: 2,
 						Int:          2,

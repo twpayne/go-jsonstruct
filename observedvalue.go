@@ -20,9 +20,9 @@ type ObservedValue struct {
 	Object                  int
 	String                  int
 	Time                    int // time.Time is an implicit more specific type than string.
-	AllArrayElements        *ObservedValue
+	AllArrayElementValues   *ObservedValue
 	AllObjectPropertyValues *ObservedValue
-	ObjectPropertyValues    map[string]*ObservedValue
+	ObjectPropertyValue     map[string]*ObservedValue
 }
 
 // Merge merges value into o.
@@ -34,11 +34,11 @@ func (o *ObservedValue) Merge(value interface{}) *ObservedValue {
 	switch value := value.(type) {
 	case []interface{}:
 		o.Array++
-		if o.AllArrayElements == nil {
-			o.AllArrayElements = &ObservedValue{}
+		if o.AllArrayElementValues == nil {
+			o.AllArrayElementValues = &ObservedValue{}
 		}
 		for _, e := range value {
-			o.AllArrayElements = o.AllArrayElements.Merge(e)
+			o.AllArrayElementValues = o.AllArrayElementValues.Merge(e)
 		}
 	case bool:
 		o.Bool++
@@ -50,12 +50,12 @@ func (o *ObservedValue) Merge(value interface{}) *ObservedValue {
 		o.Null++
 	case map[string]interface{}:
 		o.Object++
-		if o.ObjectPropertyValues == nil {
-			o.ObjectPropertyValues = make(map[string]*ObservedValue)
+		if o.ObjectPropertyValue == nil {
+			o.ObjectPropertyValue = make(map[string]*ObservedValue)
 		}
 		for k, v := range value {
 			o.AllObjectPropertyValues = o.AllObjectPropertyValues.Merge(v)
-			o.ObjectPropertyValues[k] = o.ObjectPropertyValues[k].Merge(v)
+			o.ObjectPropertyValue[k] = o.ObjectPropertyValue[k].Merge(v)
 		}
 	case string:
 		o.String++
