@@ -58,10 +58,12 @@ func (o *ObservedValue) Merge(value interface{}) *ObservedValue {
 			o.ObjectPropertyValue[k] = o.ObjectPropertyValue[k].Merge(v)
 		}
 	case string:
-		o.String++
-		if _, err := time.Parse(time.RFC3339Nano, value); err == nil {
-			o.Time++
+		if o.Time == o.String {
+			if _, err := time.Parse(time.RFC3339Nano, value); err == nil {
+				o.Time++
+			}
 		}
+		o.String++
 	case json.Number:
 		if _, err := value.Int64(); err == nil {
 			o.Int++
