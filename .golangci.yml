@@ -1,0 +1,20 @@
+linters:
+  enable-all: true
+  disable:
+  - funlen
+  - gocognit
+  - goconst
+  - gocyclo
+  - godox
+  - lll
+  - maligned
+  - wsl
+
+issues:
+  exclude-rules:
+  - linters:
+    - gochecknoglobals
+    path: "cmd/gojsonstruct/.*\\.go$"
+  - linters:
+    - scopelint
+    path: "_test\\.go$"
