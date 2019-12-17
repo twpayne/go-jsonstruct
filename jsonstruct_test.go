@@ -616,6 +616,17 @@ func TestObserveGoCode(t *testing.T) {
 				"}\n",
 		},
 		{
+			name: "empty_component_in_property",
+			json: "" +
+				`{"int--key":0}`,
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\tIntKey int `json:\"int--key\"`\n" +
+				"}\n",
+		},
+		{
 			name: "slice_in_object",
 			json: "" +
 				`{"slice":[]}` +
