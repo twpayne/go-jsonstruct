@@ -533,13 +533,15 @@ func TestObserveGoCode(t *testing.T) {
 		expectedGoCodeStr string
 	}{
 		{
-			name:    "error",
-			json:    `"`,
+			name: "error",
+			json: "" +
+				`"`,
 			wantErr: true,
 		},
 		{
 			name: "empty",
-			json: ``,
+			json: "" +
+				``,
 			expectedGoCodeStr: "" +
 				"package main\n" +
 				"\n" +
@@ -547,7 +549,8 @@ func TestObserveGoCode(t *testing.T) {
 		},
 		{
 			name: "bool",
-			json: `true`,
+			json: "" +
+				`true`,
 			expectedGoCodeStr: "" +
 				"package main\n" +
 				"\n" +
@@ -555,7 +558,8 @@ func TestObserveGoCode(t *testing.T) {
 		},
 		{
 			name: "int",
-			json: `0`,
+			json: "" +
+				`0`,
 			expectedGoCodeStr: "" +
 				"package main\n" +
 				"\n" +
@@ -563,7 +567,8 @@ func TestObserveGoCode(t *testing.T) {
 		},
 		{
 			name: "float64",
-			json: `0.0`,
+			json: "" +
+				`0.0`,
 			expectedGoCodeStr: "" +
 				"package main\n" +
 				"\n" +
