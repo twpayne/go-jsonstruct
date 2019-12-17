@@ -33,7 +33,7 @@ Go program. Example collections include:
 
 Install go-jsonstruct:
 
-    GO111MODULE=off go get -u github.com/twpayne/go-jsonstruct/cmd/gojsonstruct
+    go get -u github.com/twpayne/go-jsonstruct/cmd/gojsonstruct
 
 Feed it some JSON objects and print the Go struct output:
 
