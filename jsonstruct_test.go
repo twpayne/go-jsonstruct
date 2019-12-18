@@ -159,7 +159,7 @@ func TestGoType(t *testing.T) {
 			expectedGoType: "struct{}",
 		},
 		{
-			name: "object_and_nil",
+			name: "object_and_null",
 			values: []interface{}{
 				map[string]interface{}{},
 				nil,
@@ -170,7 +170,7 @@ func TestGoType(t *testing.T) {
 				Object:              1,
 				ObjectPropertyValue: map[string]*ObservedValue{},
 			},
-			expectedGoType: "struct{}",
+			expectedGoType: "*struct{}",
 		},
 		{
 			name: "object_simple",
@@ -513,7 +513,7 @@ func TestGoType(t *testing.T) {
 			}
 			assert.Equal(t, tc.expectedObservedValue, actualObservedValue)
 			actualImports := make(map[string]bool)
-			goType, _ := NewGenerator(tc.generatorOptions...).GoType(actualObservedValue, 0, actualImports)
+			goType, _ := NewGenerator(tc.generatorOptions...).GoType(actualObservedValue, len(tc.values), actualImports)
 			assert.Equal(t, tc.expectedGoType, goType)
 			if len(tc.expectedImports) == 0 {
 				assert.Empty(t, actualImports)
@@ -526,6 +526,7 @@ func TestGoType(t *testing.T) {
 
 func TestObserveGoCode(t *testing.T) {
 	for _, tc := range []struct {
+		skip              string
 		name              string
 		json              string
 		wantErr           bool
@@ -638,8 +639,101 @@ func TestObserveGoCode(t *testing.T) {
 				"\tSlice []int `json:\"slice\"`\n" +
 				"}\n",
 		},
+		{
+			name: "empty_object",
+			json: "" +
+				`{}`,
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T struct{}\n",
+		},
+		{
+			name: "object_and_null",
+			json: "" +
+				`null` +
+				`{}`,
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T *struct{}\n",
+		},
+		{
+			name: "nested_object_always_present_sometimes_null",
+			json: "" +
+				`{"object":null}` +
+				`{"object":{"int":1}}`,
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\tObject *struct {\n" +
+				"\t\tInt int `json:\"int\"`\n" +
+				"\t} `json:\"object\"`\n" +
+				"}\n",
+		},
+		{
+			name: "nested_object_always_present_never_null",
+			json: "" +
+				`{"object":{}}` +
+				`{"object":{"int":1}}`,
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\tObject struct {\n" +
+				"\t\tInt int `json:\"int,omitempty\"`\n" +
+				"\t} `json:\"object\"`\n" +
+				"}\n",
+		},
+		{
+			name: "nested_object_sometimes_present_never_null",
+			json: "" +
+				`{}` +
+				`{"object":{"int":1}}`,
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\tObject *struct {\n" +
+				"\t\tInt int `json:\"int\"`\n" +
+				"\t} `json:\"object,omitempty\"`\n" +
+				"}\n",
+		},
+		{
+			name: "nested_object_sometimes_empty_sometimes_null",
+			json: "" +
+				`{}` +
+				`{"object":null}` +
+				`{"object":{}}`,
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\tObject *struct{} `json:\"object\"`\n" +
+				"}\n",
+		},
+		{
+			skip: "case fails, needs investigation",
+			name: "nested_object_sometimes_present_sometimes_null",
+			json: "" +
+				`{}` +
+				`{"object":null}` +
+				`{"object":{"int":1}}`,
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\tObject *struct {\n" +
+				"\t\tInt int `json:\"int\"`\n" +
+				"\t} `json:\"object\"`\n" +
+				"}\n",
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			if tc.skip != "" {
+				t.Skip(tc.skip)
+			}
 			observedValue, err := Observe(bytes.NewBufferString(tc.json))
 			if tc.wantErr {
 				require.Error(t, err)

@@ -186,7 +186,16 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 		fallthrough
 	case distinctTypes == 2 && o.Object > 0 && o.Null > 0:
 		if len(o.ObjectPropertyValue) == 0 {
-			return "struct{}", o.Object+o.Null < observations
+			switch {
+			case observations == 0 && o.Null == 0:
+				return "struct{}", false
+			case o.Null > 0:
+				return "*struct{}", false
+			case o.Object == observations:
+				return "struct{}", false
+			default:
+				return "*struct{}", o.Object < observations
+			}
 		}
 		hasUnparseableProperties := false
 		for k := range o.ObjectPropertyValue {
@@ -228,7 +237,16 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 			fmt.Fprintf(b, "// %q cannot be unmarshalled into a struct field by encoding/json.\n", k)
 		}
 		fmt.Fprintf(b, "}")
-		return b.String(), o.Object+o.Null < observations
+		switch {
+		case observations == 0:
+			return b.String(), false
+		case o.Object == observations:
+			return b.String(), false
+		case o.Object < observations && o.Null == 0:
+			return "*" + b.String(), true
+		default:
+			return "*" + b.String(), o.Object+o.Null < observations
+		}
 	case distinctTypes == 1 && o.String > 0 && o.Time == o.String:
 		imports["time"] = true
 		return "time.Time", o.Time < observations
