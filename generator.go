@@ -165,21 +165,21 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 		fallthrough
 	case distinctTypes == 2 && o.Array > 0 && o.Null > 0:
 		elementGoType, _ := g.GoType(o.AllArrayElementValues, 0, imports)
-		return "[]" + elementGoType, o.Array+o.Null < observations
+		return "[]" + elementGoType, o.Array+o.Null < observations && o.Empty == 0
 	case distinctTypes == 1 && o.Bool > 0:
-		return "bool", o.Bool < observations
+		return "bool", o.Bool < observations && o.Empty == 0
 	case distinctTypes == 2 && o.Bool > 0 && o.Null > 0:
 		return "*bool", false
 	case distinctTypes == 1 && o.Float64 > 0:
-		return "float64", o.Float64 < observations
+		return "float64", o.Float64 < observations && o.Empty == 0
 	case distinctTypes == 2 && o.Float64 > 0 && o.Null > 0:
 		return "*float64", false
 	case distinctTypes == 1 && o.Int > 0:
-		return "int", o.Int < observations
+		return "int", o.Int < observations && o.Empty == 0
 	case distinctTypes == 2 && o.Int > 0 && o.Null > 0:
 		return "*int", false
 	case distinctTypes == 2 && o.Float64 > 0 && o.Int > 0:
-		return "float64", o.Float64+o.Int < observations
+		return "float64", o.Float64+o.Int < observations && o.Empty == 0
 	case distinctTypes == 3 && o.Float64 > 0 && o.Int > 0 && o.Null > 0:
 		return "*float64", false
 	case distinctTypes == 1 && o.Object > 0:
@@ -251,7 +251,7 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 		imports["time"] = true
 		return "time.Time", o.Time < observations
 	case distinctTypes == 1 && o.String > 0:
-		return "string", o.String < observations
+		return "string", o.String < observations && o.Empty == 0
 	case distinctTypes == 2 && o.String > 0 && o.Null > 0 && o.Time == o.String:
 		imports["time"] = true
 		return "*time.Time", false

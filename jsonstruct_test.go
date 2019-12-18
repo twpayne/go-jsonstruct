@@ -24,6 +24,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations:          1,
+				Empty:                 1,
 				Array:                 1,
 				AllArrayElementValues: &ObservedValue{},
 			},
@@ -41,15 +42,28 @@ func TestGoType(t *testing.T) {
 				Array:        1,
 				AllArrayElementValues: &ObservedValue{
 					Observations: 1,
+					Empty:        1,
 					Bool:         1,
 				},
 			},
 			expectedGoType: "[]bool",
 		},
 		{
-			name: "bool",
+			name: "bool_false",
 			values: []interface{}{
 				false,
+			},
+			expectedObservedValue: &ObservedValue{
+				Observations: 1,
+				Empty:        1,
+				Bool:         1,
+			},
+			expectedGoType: "bool",
+		},
+		{
+			name: "bool_true",
+			values: []interface{}{
+				true,
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations: 1,
@@ -65,15 +79,28 @@ func TestGoType(t *testing.T) {
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations: 2,
+				Empty:        1,
 				Bool:         1,
 				Null:         1,
 			},
 			expectedGoType: "*bool",
 		},
 		{
-			name: "float64",
+			name: "float64_zero",
 			values: []interface{}{
 				0.0,
+			},
+			expectedObservedValue: &ObservedValue{
+				Observations: 1,
+				Empty:        1,
+				Float64:      1,
+			},
+			expectedGoType: "float64",
+		},
+		{
+			name: "float64_nonzero",
+			values: []interface{}{
+				1.0,
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations: 1,
@@ -89,15 +116,28 @@ func TestGoType(t *testing.T) {
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations: 2,
+				Empty:        1,
 				Float64:      1,
 				Null:         1,
 			},
 			expectedGoType: "*float64",
 		},
 		{
-			name: "int",
+			name: "int_zero",
 			values: []interface{}{
 				0,
+			},
+			expectedObservedValue: &ObservedValue{
+				Observations: 1,
+				Empty:        1,
+				Int:          1,
+			},
+			expectedGoType: "int",
+		},
+		{
+			name: "int_nonzero",
+			values: []interface{}{
+				1,
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations: 1,
@@ -113,6 +153,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations: 2,
+				Empty:        1,
 				Int:          1,
 				Null:         1,
 			},
@@ -126,6 +167,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations: 2,
+				Empty:        2,
 				Float64:      1,
 				Int:          1,
 			},
@@ -140,6 +182,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations: 3,
+				Empty:        2,
 				Float64:      1,
 				Int:          1,
 				Null:         1,
@@ -153,6 +196,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations:        1,
+				Empty:               1,
 				Object:              1,
 				ObjectPropertyValue: map[string]*ObservedValue{},
 			},
@@ -166,6 +210,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations:        2,
+				Empty:               1,
 				Null:                1,
 				Object:              1,
 				ObjectPropertyValue: map[string]*ObservedValue{},
@@ -185,11 +230,13 @@ func TestGoType(t *testing.T) {
 				ObjectPropertyValue: map[string]*ObservedValue{
 					"key": {
 						Observations: 1,
+						Empty:        1,
 						Bool:         1,
 					},
 				},
 				AllObjectPropertyValues: &ObservedValue{
 					Observations: 1,
+					Empty:        1,
 					Bool:         1,
 				},
 			},
@@ -208,11 +255,13 @@ func TestGoType(t *testing.T) {
 				ObjectPropertyValue: map[string]*ObservedValue{
 					"key with spaces": {
 						Observations: 1,
+						Empty:        1,
 						Bool:         1,
 					},
 				},
 				AllObjectPropertyValues: &ObservedValue{
 					Observations: 1,
+					Empty:        1,
 					Bool:         1,
 				},
 			},
@@ -232,6 +281,7 @@ func TestGoType(t *testing.T) {
 				ObjectPropertyValue: map[string]*ObservedValue{
 					"key with spaces": {
 						Observations: 1,
+						Empty:        1,
 						Bool:         1,
 					},
 					"another key with spaces": {
@@ -241,6 +291,7 @@ func TestGoType(t *testing.T) {
 				},
 				AllObjectPropertyValues: &ObservedValue{
 					Observations: 2,
+					Empty:        1,
 					Bool:         2,
 				},
 			},
@@ -263,15 +314,18 @@ func TestGoType(t *testing.T) {
 				ObjectPropertyValue: map[string]*ObservedValue{
 					"key with spaces": {
 						Observations: 1,
+						Empty:        1,
 						Bool:         1,
 					},
 					"another key with spaces": {
 						Observations: 1,
+						Empty:        1,
 						Int:          1,
 					},
 				},
 				AllObjectPropertyValues: &ObservedValue{
 					Observations: 2,
+					Empty:        2,
 					Bool:         1,
 					Int:          1,
 				},
@@ -305,9 +359,21 @@ func TestGoType(t *testing.T) {
 			expectedGoType: "struct {\nKebabCase bool `json:\"kebab-case\"`\n}",
 		},
 		{
-			name: "string",
+			name: "string_empty",
 			values: []interface{}{
 				"",
+			},
+			expectedObservedValue: &ObservedValue{
+				Observations: 1,
+				Empty:        1,
+				String:       1,
+			},
+			expectedGoType: "string",
+		},
+		{
+			name: "string_nonempty",
+			values: []interface{}{
+				"string",
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations: 1,
@@ -323,6 +389,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations: 2,
+				Empty:        1,
 				String:       1,
 				Null:         1,
 			},
@@ -368,6 +435,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations: 2,
+				Empty:        1,
 				String:       2,
 				Time:         1,
 			},
@@ -382,6 +450,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations: 3,
+				Empty:        1,
 				Null:         1,
 				String:       2,
 				Time:         1,
@@ -401,11 +470,13 @@ func TestGoType(t *testing.T) {
 				ObjectPropertyValue: map[string]*ObservedValue{
 					"gpsAltitude": {
 						Observations: 1,
+						Empty:        1,
 						Int:          1,
 					},
 				},
 				AllObjectPropertyValues: &ObservedValue{
 					Observations: 1,
+					Empty:        1,
 					Int:          1,
 				},
 			},
@@ -431,11 +502,13 @@ func TestGoType(t *testing.T) {
 				ObjectPropertyValue: map[string]*ObservedValue{
 					"key": {
 						Observations: 1,
+						Empty:        1,
 						Int:          1,
 					},
 				},
 				AllObjectPropertyValues: &ObservedValue{
 					Observations: 1,
+					Empty:        1,
 					Int:          1,
 				},
 			},
@@ -454,15 +527,18 @@ func TestGoType(t *testing.T) {
 			},
 			expectedObservedValue: &ObservedValue{
 				Observations: 2,
+				Empty:        1,
 				Object:       2,
 				ObjectPropertyValue: map[string]*ObservedValue{
 					"key": {
 						Observations: 1,
+						Empty:        1,
 						Int:          1,
 					},
 				},
 				AllObjectPropertyValues: &ObservedValue{
 					Observations: 1,
+					Empty:        1,
 					Int:          1,
 				},
 			},
@@ -488,22 +564,25 @@ func TestGoType(t *testing.T) {
 				ObjectPropertyValue: map[string]*ObservedValue{
 					"key1": {
 						Observations: 2,
+						Empty:        2,
 						Int:          2,
 					},
 					"key2": {
 						Observations: 1,
+						Empty:        1,
 						Int:          1,
 					},
 				},
 				AllObjectPropertyValues: &ObservedValue{
 					Observations: 3,
+					Empty:        3,
 					Int:          3,
 				},
 			},
 			generatorOptions: []GeneratorOption{
 				WithOmitEmpty(OmitEmptyAuto),
 			},
-			expectedGoType: "struct {\nKey1 int `json:\"key1\"`\nKey2 int `json:\"key2,omitempty\"`\n}",
+			expectedGoType: "struct {\nKey1 int `json:\"key1\"`\nKey2 int `json:\"key2\"`\n}",
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {

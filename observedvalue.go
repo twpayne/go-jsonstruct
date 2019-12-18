@@ -12,6 +12,7 @@ import (
 // An ObservedValue is an observed value.
 type ObservedValue struct {
 	Observations            int
+	Empty                   int
 	Array                   int
 	Bool                    int
 	Float64                 int
@@ -34,6 +35,9 @@ func (o *ObservedValue) Merge(value interface{}) *ObservedValue {
 	switch value := value.(type) {
 	case []interface{}:
 		o.Array++
+		if len(value) == 0 {
+			o.Empty++
+		}
 		if o.AllArrayElementValues == nil {
 			o.AllArrayElementValues = &ObservedValue{}
 		}
@@ -42,14 +46,26 @@ func (o *ObservedValue) Merge(value interface{}) *ObservedValue {
 		}
 	case bool:
 		o.Bool++
+		if !value {
+			o.Empty++
+		}
 	case float64:
 		o.Float64++
+		if value == 0 {
+			o.Empty++
+		}
 	case int:
 		o.Int++
+		if value == 0 {
+			o.Empty++
+		}
 	case nil:
 		o.Null++
 	case map[string]interface{}:
 		o.Object++
+		if len(value) == 0 {
+			o.Empty++
+		}
 		if o.ObjectPropertyValue == nil {
 			o.ObjectPropertyValue = make(map[string]*ObservedValue)
 		}
@@ -58,6 +74,9 @@ func (o *ObservedValue) Merge(value interface{}) *ObservedValue {
 			o.ObjectPropertyValue[k] = o.ObjectPropertyValue[k].Merge(v)
 		}
 	case string:
+		if value == "" {
+			o.Empty++
+		}
 		if o.Time == o.String {
 			if _, err := time.Parse(time.RFC3339Nano, value); err == nil {
 				o.Time++
