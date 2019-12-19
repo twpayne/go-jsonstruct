@@ -217,7 +217,7 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 		fmt.Fprintf(b, "struct {\n")
 		var unparseableProperties []string
 		for _, k := range properties {
-			if strings.ContainsRune(k, ' ') {
+			if isUnparseableProperty(k) {
 				unparseableProperties = append(unparseableProperties, k)
 				continue
 			}
@@ -260,4 +260,9 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 	default:
 		return "interface{}", o.Array+o.Bool+o.Float64+o.Int+o.Null+o.Object+o.String < observations
 	}
+}
+
+// isUnparseableProperty returns true if key cannot be parsed by encoding/json.
+func isUnparseableProperty(key string) bool {
+	return strings.ContainsAny(key, ` ",`)
 }
