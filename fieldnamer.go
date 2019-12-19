@@ -10,15 +10,19 @@ import (
 //nolint:gochecknoglobals
 var (
 	WellKnownAbbreviations = map[string]bool{
-		"API":  true,
-		"DB":   true,
-		"HTTP": true,
-		"ID":   true,
-		"JSON": true,
-		"SQL":  true,
-		"URI":  true,
-		"URL":  true,
-		"XML":  true,
+		"API":   true,
+		"DB":    true,
+		"HTTP":  true,
+		"HTTPS": true,
+		"ID":    true,
+		"JSON":  true,
+		"OS":    true,
+		"SQL":   true,
+		"SSH":   true,
+		"URI":   true,
+		"URL":   true,
+		"XML":   true,
+		"YAML":  true,
 	}
 
 	defaultFieldNamer = &AbbreviationHandlingFieldNamer{
