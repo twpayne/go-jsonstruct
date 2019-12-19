@@ -35,6 +35,7 @@ type Generator struct {
 	packageName               string
 	typeComment               string
 	typeName                  string
+	structTagName             string
 }
 
 // A GeneratorOption sets an option on a Generator.
@@ -76,6 +77,13 @@ func WithSkipUnparseableProperties(skipUnparseableProperties bool) GeneratorOpti
 	}
 }
 
+// WithStructTagName sets the struct tag name.
+func WithStructTagName(structTagName string) GeneratorOption {
+	return func(g *Generator) {
+		g.structTagName = structTagName
+	}
+}
+
 // WithTypeComment sets the type comment.
 func WithTypeComment(typeComment string) GeneratorOption {
 	return func(g *Generator) {
@@ -98,6 +106,7 @@ func NewGenerator(options ...GeneratorOption) *Generator {
 		skipUnparseableProperties: true,
 		packageName:               "main",
 		typeName:                  "T",
+		structTagName:             "json",
 	}
 	for _, o := range options {
 		o(g)
@@ -231,7 +240,7 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 			case g.omitEmptyOption == OmitEmptyAuto:
 				omitEmpty = observedEmpty
 			}
-			fmt.Fprintf(b, "%s %s `json:\"%s%s\"`\n", g.fieldNamer.FieldName(k), goType, k, omitEmptyModifier[omitEmpty])
+			fmt.Fprintf(b, "%s %s `%s:\"%s%s\"`\n", g.fieldNamer.FieldName(k), goType, g.structTagName, k, omitEmptyModifier[omitEmpty])
 		}
 		for _, k := range unparseableProperties {
 			fmt.Fprintf(b, "// %q cannot be unmarshalled into a struct field by encoding/json.\n", k)

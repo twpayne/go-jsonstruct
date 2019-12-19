@@ -19,6 +19,7 @@ var (
 	packageComment            = flag.String("packagecomment", "", "package comment")
 	packageName               = flag.String("packagename", "main", "package name")
 	skipUnparseableProperties = flag.Bool("skipunparseableproperties", true, "skip unparseable properties")
+	structTagName             = flag.String("structtagname", "", "struct tag name")
 	typeComment               = flag.String("typecomment", "", "type comment")
 	typeName                  = flag.String("typename", "T", "type name")
 
@@ -84,6 +85,9 @@ func run() error {
 	}
 	if *typeName != "" {
 		options = append(options, jsonstruct.WithTypeName(*typeName))
+	}
+	if *structTagName != "" {
+		options = append(options, jsonstruct.WithStructTagName(*structTagName))
 	}
 
 	goCode, err := jsonstruct.NewGenerator(options...).GoCode(observedValue)

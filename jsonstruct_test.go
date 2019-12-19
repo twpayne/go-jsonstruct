@@ -880,6 +880,19 @@ func TestObserveYAMLGoCode(t *testing.T) {
 				"\n" +
 				"type T string\n",
 		},
+		{
+			name: "object",
+			yaml: "int: 0\n",
+			generatorOptions: []GeneratorOption{
+				WithStructTagName("yaml"),
+			},
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\tInt int `yaml:\"int\"`\n" +
+				"}\n",
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.skip != "" {
