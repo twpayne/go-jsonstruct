@@ -46,6 +46,9 @@ func (a *AbbreviationHandlingFieldNamer) FieldName(property string) string {
 			// do nothing
 		case a.Abbreviations[strings.ToUpper(component)]:
 			components[i] = strings.ToUpper(component)
+		case component == strings.ToUpper(component):
+			runes := []rune(component)
+			components[i] = string(runes[0]) + strings.ToLower(string(runes[1:]))
 		default:
 			runes := []rune(component)
 			runes[0] = unicode.ToUpper(runes[0])
