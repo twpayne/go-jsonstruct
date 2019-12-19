@@ -793,6 +793,18 @@ func TestObserveGoCode(t *testing.T) {
 				"}\n",
 		},
 		{
+			name: "nested_empty_object_sometimes_present_never_null",
+			json: "" +
+				`{}` +
+				`{"object":{}}`,
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\tObject *struct{} `json:\"object,omitempty\"`\n" +
+				"}\n",
+		},
+		{
 			skip: "case fails, needs investigation",
 			name: "nested_object_sometimes_present_sometimes_null",
 			json: "" +
