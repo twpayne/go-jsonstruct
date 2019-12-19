@@ -13,6 +13,7 @@ import (
 
 var (
 	abbreviations             = flag.String("abbreviations", "", "comma-separated list of extra abbreviations")
+	format                    = flag.String("format", "json", "format (json or yaml)")
 	uncompress                = flag.Bool("z", false, "decompress input with gzip")
 	omitempty                 = flag.String("omitempty", "auto", "generate omitempty (never, always, or auto)")
 	packageComment            = flag.String("packagecomment", "", "package comment")
@@ -40,7 +41,16 @@ func run() error {
 		}
 	}
 
-	observedValue, err := jsonstruct.Observe(input)
+	var observedValue *jsonstruct.ObservedValue
+	var err error
+	switch *format {
+	case "json":
+		observedValue, err = jsonstruct.ObserveJSON(input)
+	case "yaml":
+		observedValue, err = jsonstruct.ObserveYAML(input)
+	default:
+		return fmt.Errorf("unknown format: %s", *format)
+	}
 	if err != nil {
 		return err
 	}

@@ -603,7 +603,7 @@ func TestGoType(t *testing.T) {
 	}
 }
 
-func TestObserveGoCode(t *testing.T) {
+func TestObserveJSONGoCode(t *testing.T) {
 	for _, tc := range []struct {
 		skip              string
 		name              string
@@ -825,7 +825,67 @@ func TestObserveGoCode(t *testing.T) {
 			if tc.skip != "" {
 				t.Skip(tc.skip)
 			}
-			observedValue, err := Observe(bytes.NewBufferString(tc.json))
+			observedValue, err := ObserveJSON(bytes.NewBufferString(tc.json))
+			if tc.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			goCode, err := NewGenerator(tc.generatorOptions...).GoCode(observedValue)
+			require.NoError(t, err)
+			assert.Equal(t, tc.expectedGoCodeStr, string(goCode))
+		})
+	}
+}
+
+func TestObserveYAMLGoCode(t *testing.T) {
+	for _, tc := range []struct {
+		skip              string
+		name              string
+		yaml              string
+		wantErr           bool
+		generatorOptions  []GeneratorOption
+		expectedGoCodeStr string
+	}{
+		{
+			name: "empty",
+			yaml: "",
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T interface{}\n",
+		},
+		{
+			name:    "error",
+			yaml:    "\"",
+			wantErr: true,
+		},
+		{
+			name: "bool",
+			yaml: "" +
+				`true`,
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T bool\n",
+		},
+		{
+			name: "strings",
+			yaml: "---\n" +
+				"\"a\"\n" +
+				"---\n" +
+				"\"b\"\n",
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T string\n",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.skip != "" {
+				t.Skip(tc.skip)
+			}
+			observedValue, err := ObserveYAML(bytes.NewBufferString(tc.yaml))
 			if tc.wantErr {
 				require.Error(t, err)
 				return

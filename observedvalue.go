@@ -2,8 +2,6 @@ package jsonstruct
 
 import (
 	"encoding/json"
-	"errors"
-	"io"
 	"time"
 )
 
@@ -91,23 +89,4 @@ func (o *ObservedValue) Merge(value interface{}) *ObservedValue {
 		}
 	}
 	return o
-}
-
-// Observe returns all values observed in r.
-func Observe(r io.Reader) (*ObservedValue, error) {
-	decoder := json.NewDecoder(r)
-	decoder.UseNumber()
-	observedValue := &ObservedValue{}
-	for {
-		var value interface{}
-		err := decoder.Decode(&value)
-		switch {
-		case errors.Is(err, io.EOF):
-			return observedValue, nil
-		case err != nil:
-			return nil, err
-		default:
-			observedValue = observedValue.Merge(value)
-		}
-	}
 }
