@@ -51,6 +51,54 @@ type T struct {
 }
 ```
 
+This example demonstrates:
+
+* `age` is always observed as an integer, and so is given type `int`. The
+  lower-case JSON property `age` is converted into an exported Go field name
+  `Age` for compatibility with `encoding/json`.
+* `favoriteFoods` is observed as a JSON array, but is not always present, but
+  when it is present it only contains JSON strings, and so is given type
+  `[]string`. The `camelCase` name `favoriteFoods` is converted into the
+  exported Go field name `FavoriteFoods` and is tagged with `omitempty`.
+* `user_height_m` is observed as JSON numbers `2` and `1.7`, for which the most
+  general Go type is `float64`. The `snake_case` name `user_height_m` is
+  converted to the exported Go field name `UserHeightM`.
+
+go-jsonstruct recursively handles nested array elements and objects. For
+example, if you run:
+
+    echo '{"nested":{"bar":true,"foo":"baz"}}' '{"nested":{"bar":false,"foo":null}}' '{"nested":{"bar":true,"foo":""}}' | gojsonstruct -packagename mypackage -typename MyType
+
+You will get the output:
+
+```go
+package mypackage
+
+type MyType struct {
+        Nested struct {
+                Bar bool    `json:"bar"`
+                Foo *string `json:"foo"`
+        } `json:"nested"`
+}
+```
+
+This demonstrates:
+
+* The package name and type name can be set on the command line.
+* The arbitrarily-complex property `nested` is recursively converted to a nested
+  `struct` that all values can be unmarshalled to. go-jsonstruct handles array
+  elements in an identical fashion, resolving array elements to the
+  most-specific type.
+* `nested.bar` is always observed as a JSON bool, and is converted to a field of
+  type `bool`.
+* `nested.foo` is observed as a JSON string, a JSON null, and an empty JSON
+  string and is converted to a field of type `*string` without `omitempty`. With
+  `omitempty`, Go's `encoding/json` omits the field in the two cases of  `nil`
+  and a pointer to an empty `string`, so there is no way to distinguish between
+  the observed values of `null` and `""`. go-jsonstruct falls back to the option
+  of `*string` without `omitempty` which means that a value is always present,
+  even if empty.
+
 You can feed it your own data via the standard input, for example if you have a
 file with one JSON object per line in `objects.json` you can run:
 
