@@ -22,6 +22,7 @@ var (
 	structTagName             = flag.String("structtagname", "", "struct tag name")
 	typeComment               = flag.String("typecomment", "", "type comment")
 	typeName                  = flag.String("typename", "T", "type name")
+	useJSONNumber             = flag.Bool("usejsonnumber", false, "use json.Number")
 
 	omitEmptyOption = map[string]jsonstruct.OmitEmptyOption{
 		"never":  jsonstruct.OmitEmptyNever,
@@ -59,6 +60,7 @@ func run() error {
 	options := []jsonstruct.GeneratorOption{
 		jsonstruct.WithOmitEmpty(omitEmptyOption[*omitempty]),
 		jsonstruct.WithSkipUnparseableProperties(*skipUnparseableProperties),
+		jsonstruct.WithUseJSONNumber(*useJSONNumber),
 	}
 	if *abbreviations != "" {
 		abbreviationsMap := make(map[string]bool)

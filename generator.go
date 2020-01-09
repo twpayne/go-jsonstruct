@@ -36,6 +36,7 @@ type Generator struct {
 	typeComment               string
 	typeName                  string
 	structTagName             string
+	useJSONNumber             bool
 }
 
 // A GeneratorOption sets an option on a Generator.
@@ -98,6 +99,14 @@ func WithTypeName(typeName string) GeneratorOption {
 	}
 }
 
+// WithUseJSONNumber sets whether to use json.Number when both int and float64s
+// are observed for the same property.
+func WithUseJSONNumber(useJSONNumber bool) GeneratorOption {
+	return func(g *Generator) {
+		g.useJSONNumber = useJSONNumber
+	}
+}
+
 // NewGenerator returns a new Generator with options.
 func NewGenerator(options ...GeneratorOption) *Generator {
 	g := &Generator{
@@ -107,6 +116,7 @@ func NewGenerator(options ...GeneratorOption) *Generator {
 		packageName:               "main",
 		typeName:                  "T",
 		structTagName:             "json",
+		useJSONNumber:             false,
 	}
 	for _, o := range options {
 		o(g)
@@ -188,8 +198,17 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 	case distinctTypes == 2 && o.Int > 0 && o.Null > 0:
 		return "*int", false
 	case distinctTypes == 2 && o.Float64 > 0 && o.Int > 0:
-		return "float64", o.Float64+o.Int < observations && o.Empty == 0
+		omitEmpty := o.Float64+o.Int < observations && o.Empty == 0
+		if g.useJSONNumber {
+			imports["encoding/json"] = true
+			return "json.Number", omitEmpty
+		}
+		return "float64", omitEmpty
 	case distinctTypes == 3 && o.Float64 > 0 && o.Int > 0 && o.Null > 0:
+		if g.useJSONNumber {
+			imports["encoding/json"] = true
+			return "*json.Number", false
+		}
 		return "*float64", false
 	case distinctTypes == 1 && o.Object > 0:
 		fallthrough
