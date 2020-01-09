@@ -174,6 +174,26 @@ func TestGoType(t *testing.T) {
 			expectedGoType: "float64",
 		},
 		{
+			name: "float64_and_int_json_number",
+			values: []interface{}{
+				0.0,
+				0,
+			},
+			expectedObservedValue: &ObservedValue{
+				Observations: 2,
+				Empty:        2,
+				Float64:      1,
+				Int:          1,
+			},
+			generatorOptions: []GeneratorOption{
+				WithUseJSONNumber(true),
+			},
+			expectedGoType: "json.Number",
+			expectedImports: map[string]bool{
+				"encoding/json": true,
+			},
+		},
+		{
 			name: "float64_and_int_and_null",
 			values: []interface{}{
 				0.0,
@@ -188,6 +208,28 @@ func TestGoType(t *testing.T) {
 				Null:         1,
 			},
 			expectedGoType: "*float64",
+		},
+		{
+			name: "float64_and_int_and_null_json_number",
+			values: []interface{}{
+				0.0,
+				0,
+				nil,
+			},
+			expectedObservedValue: &ObservedValue{
+				Observations: 3,
+				Empty:        2,
+				Float64:      1,
+				Int:          1,
+				Null:         1,
+			},
+			generatorOptions: []GeneratorOption{
+				WithUseJSONNumber(true),
+			},
+			expectedGoType: "*json.Number",
+			expectedImports: map[string]bool{
+				"encoding/json": true,
+			},
 		},
 		{
 			name: "object_empty",
@@ -802,6 +844,25 @@ func TestObserveJSONGoCode(t *testing.T) {
 				"\n" +
 				"type T struct {\n" +
 				"\tObject *struct{} `json:\"object,omitempty\"`\n" +
+				"}\n",
+		},
+		{
+			name: "float_and_int_json_number",
+			json: "" +
+				`{"foo":1}` +
+				`{"foo":2.0}`,
+			generatorOptions: []GeneratorOption{
+				WithUseJSONNumber(true),
+			},
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"import (\n" +
+				"\t\"encoding/json\"\n" +
+				")\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\tFoo json.Number `json:\"foo\"`\n" +
 				"}\n",
 		},
 		{
