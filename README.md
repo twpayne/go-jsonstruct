@@ -33,11 +33,32 @@ Go program. Example collections include:
 
 Install go-jsonstruct:
 
-    go get -u github.com/twpayne/go-jsonstruct/cmd/gojsonstruct
+```sh
+go get -u github.com/twpayne/go-jsonstruct/cmd/gojsonstruct
+```
 
-Feed it some JSON objects and print the Go struct output:
+Feed it some JSON objects. For example you can feed it with
 
-    echo '{"age":37,"user_height_m":2}' '{"age":38,"user_height_m":1.7,"favoriteFoods":["cake"]}' | gojsonstruct
+```json
+{
+  "age": 37,
+  "user_height_m": 2
+}
+
+{
+  "age": 38,
+  "user_height_m": 1.7,
+  "favoriteFoods": [
+    "cake"
+  ]
+}
+```
+
+by running
+
+```sh
+echo '{"age":37,"user_height_m":2}' '{"age":38,"user_height_m":1.7,"favoriteFoods":["cake"]}' | gojsonstruct
+```
 
 This will output:
 
@@ -63,22 +84,50 @@ This example demonstrates:
 * `user_height_m` is observed as JSON numbers `2` and `1.7`, for which the most
   general Go type is `float64`. The `snake_case` name `user_height_m` is
   converted to the exported Go field name `UserHeightM`.
+* Properties are sorted alphabetically.
 
 go-jsonstruct recursively handles nested array elements and objects. For
-example, if you run:
+example, given the following three JSON objects input:
 
-    echo '{"nested":{"bar":true,"foo":"baz"}}' '{"nested":{"bar":false,"foo":null}}' '{"nested":{"bar":true,"foo":""}}' | gojsonstruct -packagename mypackage -typename MyType
+```json
+{
+  "nested": {
+    "bar": true,
+    "foo": "baz"
+  }
+}
 
-You will get the output:
+{
+  "nested": {
+    "bar": false,
+    "foo": null
+  }
+}
+
+{
+  "nested": {
+    "bar": true,
+    "foo": ""
+  }
+}
+```
+
+which you can try by running
+
+```sh
+echo '{"nested":{"bar":true,"foo":"baz"}}' '{"nested":{"bar":false,"foo":null}}' '{"nested":{"bar":true,"foo":""}}' | gojsonstruct -packagename mypackage -typename MyType
+```
+
+generates the output
 
 ```go
 package mypackage
 
 type MyType struct {
-        Nested struct {
-                Bar bool    `json:"bar"`
-                Foo *string `json:"foo"`
-        } `json:"nested"`
+    Nested struct {
+        Bar bool    `json:"bar"`
+        Foo *string `json:"foo"`
+    } `json:"nested"`
 }
 ```
 
