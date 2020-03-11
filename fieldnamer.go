@@ -59,7 +59,17 @@ func (a *AbbreviationHandlingFieldNamer) FieldName(property string) string {
 			components[i] = string(runes)
 		}
 	}
-	return strings.Join(components, "")
+	runes := []rune(strings.Join(components, ""))
+	for i, r := range runes {
+		if !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '_' {
+			runes[i] = '_'
+		}
+	}
+	fieldName := string(runes)
+	if !unicode.IsLetter(runes[0]) && runes[0] != '_' {
+		fieldName = "_" + fieldName
+	}
+	return fieldName
 }
 
 // SplitComponents splits name into components. name may be kebab case, snake
