@@ -23,6 +23,7 @@ var (
 	typeComment               = flag.String("typecomment", "", "type comment")
 	typeName                  = flag.String("typename", "T", "type name")
 	useJSONNumber             = flag.Bool("usejsonnumber", false, "use json.Number")
+	goFormat                  = flag.Bool("goformat", true, "format generated Go code")
 
 	omitEmptyOption = map[string]jsonstruct.OmitEmptyOption{
 		"never":  jsonstruct.OmitEmptyNever,
@@ -61,6 +62,7 @@ func run() error {
 		jsonstruct.WithOmitEmpty(omitEmptyOption[*omitempty]),
 		jsonstruct.WithSkipUnparseableProperties(*skipUnparseableProperties),
 		jsonstruct.WithUseJSONNumber(*useJSONNumber),
+		jsonstruct.WithGoFormat(*goFormat),
 	}
 	if *abbreviations != "" {
 		abbreviationsMap := make(map[string]bool)

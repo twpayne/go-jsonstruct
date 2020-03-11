@@ -37,6 +37,7 @@ type Generator struct {
 	typeName                  string
 	structTagName             string
 	useJSONNumber             bool
+	goFormat                  bool
 }
 
 // A GeneratorOption sets an option on a Generator.
@@ -46,6 +47,13 @@ type GeneratorOption func(*Generator)
 func WithFieldNamer(fieldNamer FieldNamer) GeneratorOption {
 	return func(g *Generator) {
 		g.fieldNamer = fieldNamer
+	}
+}
+
+// WithGoFormat sets whether the output is should be formatted with go fmt.
+func WithGoFormat(goFormat bool) GeneratorOption {
+	return func(g *Generator) {
+		g.goFormat = goFormat
 	}
 }
 
@@ -117,6 +125,7 @@ func NewGenerator(options ...GeneratorOption) *Generator {
 		typeName:                  "T",
 		structTagName:             "json",
 		useJSONNumber:             false,
+		goFormat:                  true,
 	}
 	for _, o := range options {
 		o(g)
@@ -149,6 +158,9 @@ func (g *Generator) GoCode(observedValue *ObservedValue) ([]byte, error) {
 		fmt.Fprintf(buffer, "// %s\n", g.typeComment)
 	}
 	fmt.Fprintf(buffer, "type %s %s\n", g.typeName, goType)
+	if !g.goFormat {
+		return buffer.Bytes(), nil
+	}
 	return format.Source(buffer.Bytes())
 }
 

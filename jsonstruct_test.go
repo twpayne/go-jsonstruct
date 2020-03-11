@@ -866,6 +866,17 @@ func TestObserveJSONGoCode(t *testing.T) {
 				"}\n",
 		},
 		{
+			name: "empty_object_no_go_format",
+			json: "" +
+				`{}`,
+			generatorOptions: []GeneratorOption{
+				WithGoFormat(false),
+			},
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"type T struct{}\n",
+		},
+		{
 			skip: "case fails, needs investigation",
 			name: "nested_object_sometimes_present_sometimes_null",
 			json: "" +
