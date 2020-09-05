@@ -1,20 +1,66 @@
 linters:
-  enable-all: true
+  enable:
+  - asciicheck
+  - bodyclose
+  - deadcode
+  - depguard
+  - dogsled
+  - dupl
+  - errcheck
+  - exhaustive
+  - exportloopref
+  - goconst
+  - gocritic
+  - godot
+  - gofmt
+  - gofumpt
+  - goimports
+  - golint
+  - gomodguard
+  - goprintffuncname
+  - gosec
+  - gosimple
+  - govet
+  - ineffassign
+  - interfacer
+  - misspell
+  - nakedret
+  - nestif
+  - noctx
+  - nolintlint
+  - prealloc
+  - rowserrcheck
+  - scopelint
+  - sqlclosecheck
+  - staticcheck
+  - structcheck
+  - stylecheck
+  - typecheck
+  - unconvert
+  - unparam
+  - unused
+  - varcheck
+  - whitespace
   disable:
   - funlen
+  - gochecknoglobals
   - gocognit
-  - goconst
   - gocyclo
   - godox
+  - goerr113
+  - gomnd
   - lll
   - maligned
+  - testpackage
   - wsl
+
+linters-settings:
+  goimports:
+    local-prefixes: github.com/twpayne/go-jsonstruct
 
 issues:
   exclude-rules:
   - linters:
-    - gochecknoglobals
-    path: "cmd/gojsonstruct/.*\\.go$"
-  - linters:
+    - dupl
     - scopelint
-    path: "_test\\.go$"
+    path: "_test\\.go"
