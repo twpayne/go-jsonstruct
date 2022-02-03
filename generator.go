@@ -36,6 +36,7 @@ type Generator struct {
 	typeComment               string
 	typeName                  string
 	structTagName             string
+	intType                   string
 	useJSONNumber             bool
 	goFormat                  bool
 }
@@ -54,6 +55,13 @@ func WithFieldNamer(fieldNamer FieldNamer) GeneratorOption {
 func WithGoFormat(goFormat bool) GeneratorOption {
 	return func(g *Generator) {
 		g.goFormat = goFormat
+	}
+}
+
+// WithIntType sets the integer type.
+func WithIntType(intType string) GeneratorOption {
+	return func(g *Generator) {
+		g.intType = intType
 	}
 }
 
@@ -124,6 +132,7 @@ func NewGenerator(options ...GeneratorOption) *Generator {
 		packageName:               "main",
 		typeName:                  "T",
 		structTagName:             "json",
+		intType:                   "int",
 		useJSONNumber:             false,
 		goFormat:                  true,
 	}
@@ -206,9 +215,9 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 	case distinctTypes == 2 && o.Float64 > 0 && o.Null > 0:
 		return "*float64", false
 	case distinctTypes == 1 && o.Int > 0:
-		return "int", o.Int < observations && o.Empty == 0
+		return g.intType, o.Int < observations && o.Empty == 0
 	case distinctTypes == 2 && o.Int > 0 && o.Null > 0:
-		return "*int", false
+		return "*" + g.intType, false
 	case distinctTypes == 2 && o.Float64 > 0 && o.Int > 0:
 		omitEmpty := o.Float64+o.Int < observations && o.Empty == 0
 		if g.useJSONNumber {

@@ -160,6 +160,36 @@ func TestGoType(t *testing.T) {
 			expectedGoType: "*int",
 		},
 		{
+			name: "int32_zero",
+			values: []interface{}{
+				0,
+			},
+			expectedObservedValue: &ObservedValue{
+				Observations: 1,
+				Empty:        1,
+				Int:          1,
+			},
+			generatorOptions: []GeneratorOption{
+				WithIntType("int32"),
+			},
+			expectedGoType: "int32",
+		},
+		{
+			name: "int64_zero",
+			values: []interface{}{
+				0,
+			},
+			expectedObservedValue: &ObservedValue{
+				Observations: 1,
+				Empty:        1,
+				Int:          1,
+			},
+			generatorOptions: []GeneratorOption{
+				WithIntType("int64"),
+			},
+			expectedGoType: "int64",
+		},
+		{
 			name: "float64_and_int",
 			values: []interface{}{
 				0.0,
@@ -283,6 +313,55 @@ func TestGoType(t *testing.T) {
 				},
 			},
 			expectedGoType: "struct {\nKey bool `json:\"key\"`\n}",
+		},
+		{
+			name: "object_with_nested_int",
+			values: []interface{}{
+				map[string]interface{}{
+					"key": 1,
+				},
+			},
+			expectedObservedValue: &ObservedValue{
+				Observations: 1,
+				Object:       1,
+				ObjectPropertyValue: map[string]*ObservedValue{
+					"key": {
+						Observations: 1,
+						Int:          1,
+					},
+				},
+				AllObjectPropertyValues: &ObservedValue{
+					Observations: 1,
+					Int:          1,
+				},
+			},
+			expectedGoType: "struct {\nKey int `json:\"key\"`\n}",
+		},
+		{
+			name: "object_with_nested_int_and_int64_option",
+			values: []interface{}{
+				map[string]interface{}{
+					"key": 1,
+				},
+			},
+			expectedObservedValue: &ObservedValue{
+				Observations: 1,
+				Object:       1,
+				ObjectPropertyValue: map[string]*ObservedValue{
+					"key": {
+						Observations: 1,
+						Int:          1,
+					},
+				},
+				AllObjectPropertyValues: &ObservedValue{
+					Observations: 1,
+					Int:          1,
+				},
+			},
+			generatorOptions: []GeneratorOption{
+				WithIntType("int64"),
+			},
+			expectedGoType: "struct {\nKey int64 `json:\"key\"`\n}",
 		},
 		{
 			name: "object_unparseable_properties_skip",
