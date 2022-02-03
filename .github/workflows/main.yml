@@ -27,7 +27,12 @@ jobs:
       run: go build ./...
     - name: Test
       run: go test ./...
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
     - name: Lint
-      uses: golangci/golangci-lint-action@v1
+      uses: golangci/golangci-lint-action@v2
       with:
-        version: v1.30
+        version: v1.43
