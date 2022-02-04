@@ -34,7 +34,7 @@ Go program. Example collections include:
 Install go-jsonstruct:
 
 ```sh
-go get -u github.com/twpayne/go-jsonstruct/cmd/gojsonstruct
+go install github.com/twpayne/go-jsonstruct/cmd/gojsonstruct@latest
 ```
 
 Feed it some JSON objects. For example you can feed it with
