@@ -15,7 +15,7 @@ func TestGoType(t *testing.T) {
 		expectedObservedValue *ObservedValue
 		generatorOptions      []GeneratorOption
 		expectedGoType        string
-		expectedImports       map[string]bool
+		expectedImports       map[string]struct{}
 	}{
 		{
 			name: "slice_empty",
@@ -219,8 +219,8 @@ func TestGoType(t *testing.T) {
 				WithUseJSONNumber(true),
 			},
 			expectedGoType: "json.Number",
-			expectedImports: map[string]bool{
-				"encoding/json": true,
+			expectedImports: map[string]struct{}{
+				"encoding/json": {},
 			},
 		},
 		{
@@ -257,8 +257,8 @@ func TestGoType(t *testing.T) {
 				WithUseJSONNumber(true),
 			},
 			expectedGoType: "*json.Number",
-			expectedImports: map[string]bool{
-				"encoding/json": true,
+			expectedImports: map[string]struct{}{
+				"encoding/json": {},
 			},
 		},
 		{
@@ -527,8 +527,8 @@ func TestGoType(t *testing.T) {
 				Time:         1,
 			},
 			expectedGoType: "time.Time",
-			expectedImports: map[string]bool{
-				"time": true,
+			expectedImports: map[string]struct{}{
+				"time": {},
 			},
 		},
 		{
@@ -544,8 +544,8 @@ func TestGoType(t *testing.T) {
 				Time:         1,
 			},
 			expectedGoType: "*time.Time",
-			expectedImports: map[string]bool{
-				"time": true,
+			expectedImports: map[string]struct{}{
+				"time": {},
 			},
 		},
 		{
@@ -712,7 +712,7 @@ func TestGoType(t *testing.T) {
 				actualObservedValue = actualObservedValue.Merge(value)
 			}
 			assert.Equal(t, tc.expectedObservedValue, actualObservedValue)
-			actualImports := make(map[string]bool)
+			actualImports := make(map[string]struct{})
 			goType, _ := NewGenerator(tc.generatorOptions...).GoType(actualObservedValue, len(tc.values), actualImports)
 			assert.Equal(t, tc.expectedGoType, goType)
 			if len(tc.expectedImports) == 0 {

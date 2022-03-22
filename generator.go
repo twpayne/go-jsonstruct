@@ -163,7 +163,7 @@ func (g *Generator) GoCode(observedValue *ObservedValue) ([]byte, error) {
 		fmt.Fprintf(buffer, "// %s\n", g.packageComment)
 	}
 	fmt.Fprintf(buffer, "package %s\n", g.packageName)
-	imports := make(map[string]bool)
+	imports := make(map[string]struct{})
 	goType, _ := g.GoType(observedValue, 0, imports)
 	if len(imports) > 0 {
 		importsSlice := make([]string, 0, len(imports))
@@ -188,7 +188,7 @@ func (g *Generator) GoCode(observedValue *ObservedValue) ([]byte, error) {
 }
 
 // GoType returns the Go type for o and whether it has been omitted.
-func (g *Generator) GoType(o *ObservedValue, observations int, imports map[string]bool) (string, bool) {
+func (g *Generator) GoType(o *ObservedValue, observations int, imports map[string]struct{}) (string, bool) {
 	// Determine the number of distinct types observed.
 	distinctTypes := 0
 	if o.Array > 0 {
@@ -235,13 +235,13 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 	case distinctTypes == 2 && o.Float64 > 0 && o.Int > 0:
 		omitEmpty := o.Float64+o.Int < observations && o.Empty == 0
 		if g.useJSONNumber {
-			imports["encoding/json"] = true
+			imports["encoding/json"] = struct{}{}
 			return "json.Number", omitEmpty
 		}
 		return "float64", omitEmpty
 	case distinctTypes == 3 && o.Float64 > 0 && o.Int > 0 && o.Null > 0:
 		if g.useJSONNumber {
-			imports["encoding/json"] = true
+			imports["encoding/json"] = struct{}{}
 			return "*json.Number", false
 		}
 		return "*float64", false
@@ -324,12 +324,12 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 			return "*" + b.String(), o.Object+o.Null < observations
 		}
 	case distinctTypes == 1 && o.String > 0 && o.Time == o.String:
-		imports["time"] = true
+		imports["time"] = struct{}{}
 		return "time.Time", o.Time < observations
 	case distinctTypes == 1 && o.String > 0:
 		return "string", o.String < observations && o.Empty == 0
 	case distinctTypes == 2 && o.String > 0 && o.Null > 0 && o.Time == o.String:
-		imports["time"] = true
+		imports["time"] = struct{}{}
 		return "*time.Time", false
 	case distinctTypes == 2 && o.String > 0 && o.Null > 0:
 		return "*string", false
