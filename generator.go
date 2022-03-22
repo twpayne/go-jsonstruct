@@ -36,6 +36,7 @@ type Generator struct {
 	typeComment               string
 	typeName                  string
 	structTagNames            []string
+	imports                   map[string]struct{}
 	intType                   string
 	useJSONNumber             bool
 	goFormat                  bool
@@ -115,6 +116,13 @@ func WithAddStructTagName(structTagName string) GeneratorOption {
 	}
 }
 
+// WithAddImport add custom package import.
+func WithAddImport(cImport string) GeneratorOption {
+	return func(g *Generator) {
+		g.imports[cImport] = struct{}{}
+	}
+}
+
 // WithTypeComment sets the type comment.
 func WithTypeComment(typeComment string) GeneratorOption {
 	return func(g *Generator) {
@@ -146,6 +154,7 @@ func NewGenerator(options ...GeneratorOption) *Generator {
 		packageName:               "main",
 		typeName:                  "T",
 		structTagNames:            []string{"json"},
+		imports:                   make(map[string]struct{}),
 		intType:                   "int",
 		useJSONNumber:             false,
 		goFormat:                  true,
@@ -163,7 +172,7 @@ func (g *Generator) GoCode(observedValue *ObservedValue) ([]byte, error) {
 		fmt.Fprintf(buffer, "// %s\n", g.packageComment)
 	}
 	fmt.Fprintf(buffer, "package %s\n", g.packageName)
-	imports := make(map[string]struct{})
+	imports := g.imports
 	goType, _ := g.GoType(observedValue, 0, imports)
 	if len(imports) > 0 {
 		importsSlice := make([]string, 0, len(imports))
