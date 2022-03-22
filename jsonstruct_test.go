@@ -817,6 +817,37 @@ func TestObserveJSONGoCode(t *testing.T) {
 				"}\n",
 		},
 		{
+			name: "multiple_tags",
+			json: "" +
+				`{"intKey":0,"boolKey":true}`,
+			generatorOptions: []GeneratorOption{
+				WithAddStructTagName("yaml"),
+			},
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\tBoolKey bool `json:\"boolKey\" yaml:\"boolKey\"`\n" +
+				"\tIntKey  int  `json:\"intKey\" yaml:\"intKey\"`\n" +
+				"}\n",
+		},
+		{
+			name: "multiple_tags_omitempty",
+			json: "" +
+				`{"intKey":0,"boolKey":true}` +
+				`{"intKey":0}`,
+			generatorOptions: []GeneratorOption{
+				WithStructTagNames([]string{"json", "yaml"}),
+			},
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\tBoolKey bool `json:\"boolKey,omitempty\" yaml:\"boolKey,omitempty\"`\n" +
+				"\tIntKey  int  `json:\"intKey\" yaml:\"intKey\"`\n" +
+				"}\n",
+		},
+		{
 			name: "empty_component_in_property",
 			json: "" +
 				`{"int--key":0}`,
