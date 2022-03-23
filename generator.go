@@ -8,6 +8,8 @@ import (
 	"go/format"
 	"sort"
 	"strings"
+
+	"github.com/fatih/structtag"
 )
 
 // An OmitEmptyOption is an option for handling omitempty.
@@ -19,12 +21,6 @@ const (
 	OmitEmptyAlways
 	OmitEmptyAuto
 )
-
-//nolint:gochecknoglobals
-var omitEmptyModifier = map[bool]string{
-	false: "",
-	true:  ",omitempty",
-}
 
 // A Generator generates Go types from ObservedValues.
 type Generator struct {
@@ -295,19 +291,21 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 				omitEmpty = observedEmpty
 			}
 
-			tag := "`"
-
-			for i, v := range g.structTagNames {
-				if i != 0 {
-					tag += " "
+			tags, _ := structtag.Parse("")
+			var options []string
+			if omitEmpty {
+				options = append(options, "omitempty")
+			}
+			for _, structTagName := range g.structTagNames {
+				tag := &structtag.Tag{
+					Key:     structTagName,
+					Name:    k,
+					Options: options,
 				}
-
-				tag += fmt.Sprintf("%s:\"%s%s\"", v, k, omitEmptyModifier[omitEmpty])
+				_ = tags.Set(tag)
 			}
 
-			tag += "`"
-
-			fmt.Fprintf(b, "%s %s %s\n", g.fieldNamer.FieldName(k), goType, tag)
+			fmt.Fprintf(b, "%s %s `%s`\n", g.fieldNamer.FieldName(k), goType, tags)
 		}
 		for _, k := range unparseableProperties {
 			fmt.Fprintf(b, "// %q cannot be unmarshalled into a struct field by encoding/json.\n", k)
