@@ -35,7 +35,7 @@ type Generator struct {
 	packageName               string
 	typeComment               string
 	typeName                  string
-	structTagName             string
+	structTagNames            []string
 	intType                   string
 	useJSONNumber             bool
 	goFormat                  bool
@@ -97,7 +97,21 @@ func WithSkipUnparseableProperties(skipUnparseableProperties bool) GeneratorOpti
 // WithStructTagName sets the struct tag name.
 func WithStructTagName(structTagName string) GeneratorOption {
 	return func(g *Generator) {
-		g.structTagName = structTagName
+		g.structTagNames = []string{structTagName}
+	}
+}
+
+// WithStructTagNames sets the struct tag names.
+func WithStructTagNames(structTagNames []string) GeneratorOption {
+	return func(g *Generator) {
+		g.structTagNames = structTagNames
+	}
+}
+
+// WithAddStructTagName add struct tag name.
+func WithAddStructTagName(structTagName string) GeneratorOption {
+	return func(g *Generator) {
+		g.structTagNames = append(g.structTagNames, structTagName)
 	}
 }
 
@@ -131,7 +145,7 @@ func NewGenerator(options ...GeneratorOption) *Generator {
 		skipUnparseableProperties: true,
 		packageName:               "main",
 		typeName:                  "T",
-		structTagName:             "json",
+		structTagNames:            []string{"json"},
 		intType:                   "int",
 		useJSONNumber:             false,
 		goFormat:                  true,
@@ -280,7 +294,20 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 			case g.omitEmptyOption == OmitEmptyAuto:
 				omitEmpty = observedEmpty
 			}
-			fmt.Fprintf(b, "%s %s `%s:\"%s%s\"`\n", g.fieldNamer.FieldName(k), goType, g.structTagName, k, omitEmptyModifier[omitEmpty])
+
+			tag := "`"
+
+			for i, v := range g.structTagNames {
+				if i != 0 {
+					tag += " "
+				}
+
+				tag += fmt.Sprintf("%s:\"%s%s\"", v, k, omitEmptyModifier[omitEmpty])
+			}
+
+			tag += "`"
+
+			fmt.Fprintf(b, "%s %s %s\n", g.fieldNamer.FieldName(k), goType, tag)
 		}
 		for _, k := range unparseableProperties {
 			fmt.Fprintf(b, "// %q cannot be unmarshalled into a struct field by encoding/json.\n", k)
