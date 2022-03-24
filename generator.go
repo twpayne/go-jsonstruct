@@ -116,10 +116,12 @@ func WithAddStructTagName(structTagName string) GeneratorOption {
 	}
 }
 
-// WithAddImport add custom package import.
-func WithAddImport(cImport string) GeneratorOption {
+// WithImports add custom package import.
+func WithImports(imports ...string) GeneratorOption {
 	return func(g *Generator) {
-		g.imports[cImport] = struct{}{}
+		for _, v := range imports {
+			g.imports[v] = struct{}{}
+		}
 	}
 }
 

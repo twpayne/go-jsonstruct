@@ -1006,7 +1006,7 @@ func TestObserveJSONGoCode(t *testing.T) {
 			name: "custom_imports_one",
 			json: `{}`,
 			generatorOptions: []GeneratorOption{
-				WithAddImport("custom_import"),
+				WithImports("custom_import"),
 			},
 			expectedGoCodeStr: "" +
 				"package main\n" +
@@ -1021,8 +1021,7 @@ func TestObserveJSONGoCode(t *testing.T) {
 			name: "custom_imports_multiple",
 			json: `{}`,
 			generatorOptions: []GeneratorOption{
-				WithAddImport("custom_import_one"),
-				WithAddImport("custom_import_two"),
+				WithImports("custom_import_one", "custom_import_two"),
 			},
 			expectedGoCodeStr: "" +
 				"package main\n" +
