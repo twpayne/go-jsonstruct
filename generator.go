@@ -105,14 +105,14 @@ func WithStructTagNames(structTagNames []string) GeneratorOption {
 	}
 }
 
-// WithAddStructTagName add struct tag name.
+// WithAddStructTagName adds a struct tag name.
 func WithAddStructTagName(structTagName string) GeneratorOption {
 	return func(g *Generator) {
 		g.structTagNames = append(g.structTagNames, structTagName)
 	}
 }
 
-// WithImports add custom package import.
+// WithImports adds custom package imports.
 func WithImports(imports ...string) GeneratorOption {
 	return func(g *Generator) {
 		for _, v := range imports {
@@ -170,7 +170,10 @@ func (g *Generator) GoCode(observedValue *ObservedValue) ([]byte, error) {
 		fmt.Fprintf(buffer, "// %s\n", g.packageComment)
 	}
 	fmt.Fprintf(buffer, "package %s\n", g.packageName)
-	imports := copyMap(g.imports)
+	imports := make(map[string]bool, len(g.imports))
+	for key, value := range g.imports {
+		imports[key] = value
+	}
 	goType, _ := g.GoType(observedValue, 0, imports)
 	if len(imports) > 0 {
 		importsSlice := make([]string, 0, len(imports))
@@ -192,17 +195,6 @@ func (g *Generator) GoCode(observedValue *ObservedValue) ([]byte, error) {
 		return buffer.Bytes(), nil
 	}
 	return format.Source(buffer.Bytes())
-}
-
-// copyMap returns copy of map
-func copyMap(m map[string]bool) map[string]bool {
-	r := make(map[string]bool)
-
-	for k, v := range m {
-		r[k] = v
-	}
-
-	return r
 }
 
 // GoType returns the Go type for o and whether it has been omitted.
