@@ -1002,6 +1002,37 @@ func TestObserveJSONGoCode(t *testing.T) {
 				"\t} `json:\"object\"`\n" +
 				"}\n",
 		},
+		{
+			name: "custom_imports_one",
+			json: `{}`,
+			generatorOptions: []GeneratorOption{
+				WithImports("custom_import"),
+			},
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"import (\n" +
+				"\t\"custom_import\"\n" +
+				")\n" +
+				"\n" +
+				"type T struct{}\n",
+		},
+		{
+			name: "custom_imports_multiple",
+			json: `{}`,
+			generatorOptions: []GeneratorOption{
+				WithImports("custom_import_one", "custom_import_two"),
+			},
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"import (\n" +
+				"\t\"custom_import_one\"\n" +
+				"\t\"custom_import_two\"\n" +
+				")\n" +
+				"\n" +
+				"type T struct{}\n",
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.skip != "" {
