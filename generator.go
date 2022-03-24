@@ -36,7 +36,7 @@ type Generator struct {
 	typeComment               string
 	typeName                  string
 	structTagNames            []string
-	imports                   map[string]struct{}
+	imports                   map[string]bool
 	intType                   string
 	useJSONNumber             bool
 	goFormat                  bool
@@ -120,7 +120,7 @@ func WithAddStructTagName(structTagName string) GeneratorOption {
 func WithImports(imports ...string) GeneratorOption {
 	return func(g *Generator) {
 		for _, v := range imports {
-			g.imports[v] = struct{}{}
+			g.imports[v] = true
 		}
 	}
 }
@@ -156,7 +156,7 @@ func NewGenerator(options ...GeneratorOption) *Generator {
 		packageName:               "main",
 		typeName:                  "T",
 		structTagNames:            []string{"json"},
-		imports:                   make(map[string]struct{}),
+		imports:                   make(map[string]bool),
 		intType:                   "int",
 		useJSONNumber:             false,
 		goFormat:                  true,
@@ -199,7 +199,7 @@ func (g *Generator) GoCode(observedValue *ObservedValue) ([]byte, error) {
 }
 
 // GoType returns the Go type for o and whether it has been omitted.
-func (g *Generator) GoType(o *ObservedValue, observations int, imports map[string]struct{}) (string, bool) {
+func (g *Generator) GoType(o *ObservedValue, observations int, imports map[string]bool) (string, bool) {
 	// Determine the number of distinct types observed.
 	distinctTypes := 0
 	if o.Array > 0 {
@@ -246,13 +246,13 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 	case distinctTypes == 2 && o.Float64 > 0 && o.Int > 0:
 		omitEmpty := o.Float64+o.Int < observations && o.Empty == 0
 		if g.useJSONNumber {
-			imports["encoding/json"] = struct{}{}
+			imports["encoding/json"] = true
 			return "json.Number", omitEmpty
 		}
 		return "float64", omitEmpty
 	case distinctTypes == 3 && o.Float64 > 0 && o.Int > 0 && o.Null > 0:
 		if g.useJSONNumber {
-			imports["encoding/json"] = struct{}{}
+			imports["encoding/json"] = true
 			return "*json.Number", false
 		}
 		return "*float64", false
@@ -335,12 +335,12 @@ func (g *Generator) GoType(o *ObservedValue, observations int, imports map[strin
 			return "*" + b.String(), o.Object+o.Null < observations
 		}
 	case distinctTypes == 1 && o.String > 0 && o.Time == o.String:
-		imports["time"] = struct{}{}
+		imports["time"] = true
 		return "time.Time", o.Time < observations
 	case distinctTypes == 1 && o.String > 0:
 		return "string", o.String < observations && o.Empty == 0
 	case distinctTypes == 2 && o.String > 0 && o.Null > 0 && o.Time == o.String:
-		imports["time"] = struct{}{}
+		imports["time"] = true
 		return "*time.Time", false
 	case distinctTypes == 2 && o.String > 0 && o.Null > 0:
 		return "*string", false
