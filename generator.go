@@ -174,7 +174,7 @@ func (g *Generator) GoCode(observedValue *ObservedValue) ([]byte, error) {
 		fmt.Fprintf(buffer, "// %s\n", g.packageComment)
 	}
 	fmt.Fprintf(buffer, "package %s\n", g.packageName)
-	imports := g.imports
+	imports := copyMap(g.imports)
 	goType, _ := g.GoType(observedValue, 0, imports)
 	if len(imports) > 0 {
 		importsSlice := make([]string, 0, len(imports))
@@ -196,6 +196,17 @@ func (g *Generator) GoCode(observedValue *ObservedValue) ([]byte, error) {
 		return buffer.Bytes(), nil
 	}
 	return format.Source(buffer.Bytes())
+}
+
+// copyMap returns copy of map
+func copyMap(m map[string]bool) map[string]bool {
+	r := make(map[string]bool)
+
+	for k, v := range m {
+		r[k] = v
+	}
+
+	return r
 }
 
 // GoType returns the Go type for o and whether it has been omitted.
