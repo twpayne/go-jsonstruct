@@ -82,7 +82,7 @@ This example demonstrates:
   `[]string`. The `camelCase` name `favoriteFoods` is converted into the
   exported Go field name `FavoriteFoods` and is tagged with `omitempty`.
 * `user_height_m` is observed as JSON numbers `2` and `1.7`, for which the most
-  general Go type is `float64`. The `snake_case` name `user_height_m` is
+  specific Go type is `float64`. The `snake_case` name `user_height_m` is
   converted to the exported Go field name `UserHeightM`.
 * Properties are sorted alphabetically.
 
