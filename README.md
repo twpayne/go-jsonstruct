@@ -57,7 +57,9 @@ Feed it some JSON objects. For example you can feed it with
 by running
 
 ```sh
-echo '{"age":37,"user_height_m":2}' '{"age":38,"user_height_m":1.7,"favoriteFoods":["cake"]}' | gojsonstruct
+echo '{"age":37,"user_height_m":2}' \
+    '{"age":38,"user_height_m":1.7,"favoriteFoods":["cake"]}' \
+    | gojsonstruct
 ```
 
 This will output:
@@ -115,7 +117,10 @@ example, given the following three JSON objects input:
 which you can try by running
 
 ```sh
-echo '{"nested":{"bar":true,"foo":"baz"}}' '{"nested":{"bar":false,"foo":null}}' '{"nested":{"bar":true,"foo":""}}' | gojsonstruct -packagename mypackage -typename MyType
+echo '{"nested":{"bar":true,"foo":"baz"}}' \
+    '{"nested":{"bar":false,"foo":null}}' \
+    '{"nested":{"bar":true,"foo":""}}' \
+    | gojsonstruct -packagename mypackage -typename MyType
 ```
 
 generates the output
@@ -186,7 +191,8 @@ objects and iterates over arrays.
 Secondly, in the code generation phase, go-jsonstruct inspects the gathered
 statistics and determines the strictest possible Go type that can represent all
 the observed values. For example, the values `0` and `1` can be represented as
-an `int`, whereas the values `0`, `1`, and `2.2` require a `float64`.
+an `int`, the values `0`, `1`, and `2.2` require a `float64`, and `true`, `3.3`,
+and `"name"` require and `interface{}`.
 
 ## License
 
