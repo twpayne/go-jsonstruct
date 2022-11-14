@@ -1,8 +1,6 @@
 # go-jsonstruct
 
 [![GoDoc](https://godoc.org/github.com/twpayne/go-jsonstruct?status.svg)](https://godoc.org/github.com/twpayne/go-jsonstruct)
-[![Report Card](https://goreportcard.com/badge/github.com/twpayne/go-jsonstruct)](https://goreportcard.com/report/github.com/twpayne/go-jsonstruct)
-[![Coverage Status](https://coveralls.io/repos/github/twpayne/go-jsonstruct/badge.svg)](https://coveralls.io/github/twpayne/go-jsonstruct)
 
 Generate Go structs from multiple JSON objects.
 
