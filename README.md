@@ -190,7 +190,7 @@ Secondly, in the code generation phase, go-jsonstruct inspects the gathered
 statistics and determines the strictest possible Go type that can represent all
 the observed values. For example, the values `0` and `1` can be represented as
 an `int`, the values `0`, `1`, and `2.2` require a `float64`, and `true`, `3.3`,
-and `"name"` require and `interface{}`.
+and `"name"` require and `any`.
 
 ## License
 

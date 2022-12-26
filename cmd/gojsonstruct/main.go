@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/twpayne/go-jsonstruct"
+	"github.com/twpayne/go-jsonstruct/v2"
 )
 
 var (
@@ -35,29 +35,6 @@ var (
 func run() error {
 	flag.Parse()
 
-	var input io.Reader = os.Stdin
-	if *uncompress {
-		var err error
-		input, err = gzip.NewReader(input)
-		if err != nil {
-			return err
-		}
-	}
-
-	var observedValue *jsonstruct.ObservedValue
-	var err error
-	switch *format {
-	case "json":
-		observedValue, err = jsonstruct.ObserveJSON(input)
-	case "yaml":
-		observedValue, err = jsonstruct.ObserveYAML(input)
-	default:
-		return fmt.Errorf("unknown format: %s", *format)
-	}
-	if err != nil {
-		return err
-	}
-
 	options := []jsonstruct.GeneratorOption{
 		jsonstruct.WithOmitEmpty(omitEmptyOption[*omitempty]),
 		jsonstruct.WithSkipUnparseableProperties(*skipUnparseableProperties),
@@ -65,18 +42,7 @@ func run() error {
 		jsonstruct.WithGoFormat(*goFormat),
 	}
 	if *abbreviations != "" {
-		abbreviationsMap := make(map[string]bool)
-		for abbreviation := range jsonstruct.WellKnownAbbreviations {
-			abbreviationsMap[abbreviation] = true
-		}
-		for _, abbreviation := range strings.Split(*abbreviations, ",") {
-			abbreviationsMap[abbreviation] = true
-		}
-		options = append(options, jsonstruct.WithFieldNamer(
-			&jsonstruct.AbbreviationHandlingFieldNamer{
-				Abbreviations: abbreviationsMap,
-			},
-		))
+		options = append(options, jsonstruct.WithExtraAbbreviations(strings.Split(*abbreviations, ",")...))
 	}
 	if *packageComment != "" {
 		options = append(options, jsonstruct.WithPackageComment(*packageComment))
@@ -94,7 +60,50 @@ func run() error {
 		options = append(options, jsonstruct.WithStructTagName(*structTagName))
 	}
 
-	goCode, err := jsonstruct.NewGenerator(options...).GoCode(observedValue)
+	generator := jsonstruct.NewGenerator(options...)
+
+	if flag.NArg() == 0 {
+		var input io.Reader = os.Stdin
+		if *uncompress {
+			var err error
+			input, err = gzip.NewReader(input)
+			if err != nil {
+				return err
+			}
+		}
+
+		switch *format {
+		case "json":
+			if err := generator.ObserveJSONReader(input); err != nil {
+				return err
+			}
+		case "yaml":
+			if err := generator.ObserveYAMLReader(input); err != nil {
+				return err
+			}
+		default:
+			return fmt.Errorf("unknown format: %s", *format)
+		}
+	} else {
+		switch *format {
+		case "json":
+			for _, arg := range flag.Args() {
+				if err := generator.ObserveJSONFile(arg); err != nil {
+					return err
+				}
+			}
+		case "yaml":
+			for _, arg := range flag.Args() {
+				if err := generator.ObserveYAMLFile(arg); err != nil {
+					return err
+				}
+			}
+		default:
+			return fmt.Errorf("unknown format: %s", *format)
+		}
+	}
+
+	goCode, err := generator.Generate()
 	if err != nil {
 		return err
 	}

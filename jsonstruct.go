@@ -9,7 +9,7 @@ import (
 
 //nolint:gochecknoglobals
 var (
-	WellKnownAbbreviations = map[string]bool{
+	defaultAbbreviations = map[string]bool{
 		"API":   true,
 		"DB":    true,
 		"HTTP":  true,
@@ -24,31 +24,16 @@ var (
 		"XML":   true,
 		"YAML":  true,
 	}
-
-	defaultFieldNamer = &AbbreviationHandlingFieldNamer{
-		Abbreviations: WellKnownAbbreviations,
-	}
 )
 
-// A FieldNamer generates a Go field name from a JSON property.
-type FieldNamer interface {
-	FieldName(property string) string
-}
-
-// An AbbreviationHandlingFieldNamer generates Go field names from JSON
-// properties while keeping abbreviations uppercased.
-type AbbreviationHandlingFieldNamer struct {
-	Abbreviations map[string]bool
-}
-
-// FieldName implements FieldNamer.FieldName.
-func (a *AbbreviationHandlingFieldNamer) FieldName(property string) string {
-	components := SplitComponents(property)
+// DefaultExportNameFunc returns the exported name for name.
+func DefaultExportNameFunc(name string, abbreviations map[string]bool) string {
+	components := SplitComponents(name)
 	for i, component := range components {
 		switch {
 		case component == "":
 			// do nothing
-		case a.Abbreviations[strings.ToUpper(component)]:
+		case abbreviations[strings.ToUpper(component)]:
 			components[i] = strings.ToUpper(component)
 		case component == strings.ToUpper(component):
 			runes := []rune(component)
@@ -65,11 +50,11 @@ func (a *AbbreviationHandlingFieldNamer) FieldName(property string) string {
 			runes[i] = '_'
 		}
 	}
-	fieldName := string(runes)
+	exportName := string(runes)
 	if !unicode.IsLetter(runes[0]) && runes[0] != '_' {
-		fieldName = "_" + fieldName
+		exportName = "_" + exportName
 	}
-	return fieldName
+	return exportName
 }
 
 // SplitComponents splits name into components. name may be kebab case, snake
