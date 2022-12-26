@@ -24,6 +24,7 @@ var (
 	typeName                  = flag.String("typename", "T", "type name")
 	useJSONNumber             = flag.Bool("usejsonnumber", false, "use json.Number")
 	goFormat                  = flag.Bool("goformat", true, "format generated Go code")
+	output                    = flag.String("o", "", "output")
 
 	omitEmptyOption = map[string]jsonstruct.OmitEmptyOption{
 		"never":  jsonstruct.OmitEmptyNever,
@@ -107,8 +108,13 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	_, err = os.Stdout.Write(goCode)
-	return err
+
+	if *output == "" || *output == "-" {
+		_, err = os.Stdout.Write(goCode)
+		return err
+	}
+
+	return os.WriteFile(*output, goCode, 0o666) //nolint:gosec
 }
 
 func main() {
