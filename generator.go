@@ -4,13 +4,21 @@ package jsonstruct
 
 import (
 	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"go/format"
+	"io"
+	"os"
 	"sort"
 	"strings"
 
-	"github.com/fatih/structtag"
+	"golang.org/x/exp/maps"
+	"gopkg.in/yaml.v3"
 )
+
+// An ExportNameFunc returns the exported name for a property.
+type ExportNameFunc func(string) string
 
 // An OmitEmptyOption is an option for handling omitempty.
 type OmitEmptyOption int
@@ -22,29 +30,51 @@ const (
 	OmitEmptyAuto
 )
 
-// A Generator generates Go types from ObservedValues.
+// A Generator generates Go types from observed values.
 type Generator struct {
+	abbreviations             map[string]bool
+	exportNameFunc            ExportNameFunc
+	exportRenames             map[string]string
+	goFormat                  bool
+	imports                   map[string]struct{}
+	intType                   string
 	omitEmptyOption           OmitEmptyOption
-	fieldNamer                FieldNamer
-	skipUnparseableProperties bool
 	packageComment            string
 	packageName               string
+	skipUnparseableProperties bool
+	structTagNames            []string
 	typeComment               string
 	typeName                  string
-	structTagNames            []string
-	imports                   map[string]bool
-	intType                   string
 	useJSONNumber             bool
-	goFormat                  bool
+	value                     *value
 }
 
 // A GeneratorOption sets an option on a Generator.
 type GeneratorOption func(*Generator)
 
-// WithFieldNamer sets the fieldNamer.
-func WithFieldNamer(fieldNamer FieldNamer) GeneratorOption {
+// WithAbbreviations sets the abbreviatons.
+func WithAbbreviations(abbreviations ...string) GeneratorOption {
 	return func(g *Generator) {
-		g.fieldNamer = fieldNamer
+		g.abbreviations = make(map[string]bool)
+		for _, abbreviation := range abbreviations {
+			g.abbreviations[abbreviation] = true
+		}
+	}
+}
+
+// WithExportNameFunc sets the export name function.
+func WithExportNameFunc(exportNameFunc ExportNameFunc) GeneratorOption {
+	return func(g *Generator) {
+		g.exportNameFunc = exportNameFunc
+	}
+}
+
+// WithExtraAbbreviations adds abbreviations.
+func WithExtraAbbreviations(abbreviations ...string) GeneratorOption {
+	return func(g *Generator) {
+		for _, abbreviation := range abbreviations {
+			g.abbreviations[abbreviation] = true
+		}
 	}
 }
 
@@ -83,6 +113,15 @@ func WithPackageName(packageName string) GeneratorOption {
 	}
 }
 
+// WithRenames sets the renames.
+func WithRenames(renames map[string]string) GeneratorOption {
+	return func(g *Generator) {
+		for name, rename := range renames {
+			g.exportRenames[name] = rename
+		}
+	}
+}
+
 // WithSkipUnparseableProperties sets whether unparseable properties should be
 // skipped.
 func WithSkipUnparseableProperties(skipUnparseableProperties bool) GeneratorOption {
@@ -116,7 +155,7 @@ func WithAddStructTagName(structTagName string) GeneratorOption {
 func WithImports(imports ...string) GeneratorOption {
 	return func(g *Generator) {
 		for _, v := range imports {
-			g.imports[v] = true
+			g.imports[v] = struct{}{}
 		}
 	}
 }
@@ -146,40 +185,51 @@ func WithUseJSONNumber(useJSONNumber bool) GeneratorOption {
 // NewGenerator returns a new Generator with options.
 func NewGenerator(options ...GeneratorOption) *Generator {
 	g := &Generator{
-		omitEmptyOption:           OmitEmptyAuto,
-		fieldNamer:                defaultFieldNamer,
-		skipUnparseableProperties: true,
-		packageName:               "main",
-		typeName:                  "T",
-		structTagNames:            []string{"json"},
-		imports:                   make(map[string]bool),
-		intType:                   "int",
-		useJSONNumber:             false,
+		abbreviations:             maps.Clone(defaultAbbreviations),
+		exportRenames:             make(map[string]string),
 		goFormat:                  true,
+		imports:                   make(map[string]struct{}),
+		intType:                   "int",
+		omitEmptyOption:           OmitEmptyAuto,
+		packageName:               "main",
+		skipUnparseableProperties: true,
+		structTagNames:            []string{"json"},
+		typeName:                  "T",
+		useJSONNumber:             false,
+		value:                     &value{},
 	}
-	for _, o := range options {
-		o(g)
+	g.exportNameFunc = func(name string) string {
+		if rename, ok := g.exportRenames[name]; ok {
+			return rename
+		}
+		return DefaultExportNameFunc(name, g.abbreviations)
+	}
+	for _, option := range options {
+		option(g)
 	}
 	return g
 }
 
-// GoCode returns the Go source code for o.
-func (g *Generator) GoCode(observedValue *ObservedValue) ([]byte, error) {
+// Generate returns the Go source code for the observed values.
+func (g *Generator) Generate() ([]byte, error) {
 	buffer := &bytes.Buffer{}
+	buffer.Grow(65536)
 	if g.packageComment != "" {
 		fmt.Fprintf(buffer, "// %s\n", g.packageComment)
 	}
 	fmt.Fprintf(buffer, "package %s\n", g.packageName)
-	imports := make(map[string]bool, len(g.imports))
-	for key, value := range g.imports {
-		imports[key] = value
-	}
-	goType, _ := g.GoType(observedValue, 0, imports)
+	imports := maps.Clone(g.imports)
+	goType, _ := g.value.goType(0, &generateOptions{
+		exportNameFunc:            g.exportNameFunc,
+		imports:                   imports,
+		intType:                   g.intType,
+		omitEmptyOption:           g.omitEmptyOption,
+		skipUnparseableProperties: g.skipUnparseableProperties,
+		structTagNames:            g.structTagNames,
+		useJSONNumber:             g.useJSONNumber,
+	})
 	if len(imports) > 0 {
-		importsSlice := make([]string, 0, len(imports))
-		for _import := range imports {
-			importsSlice = append(importsSlice, _import)
-		}
+		importsSlice := maps.Keys(imports)
 		sort.Strings(importsSlice)
 		fmt.Fprintf(buffer, "import (\n")
 		for _, _import := range importsSlice {
@@ -197,157 +247,64 @@ func (g *Generator) GoCode(observedValue *ObservedValue) ([]byte, error) {
 	return format.Source(buffer.Bytes())
 }
 
-// GoType returns the Go type for o and whether it has been omitted.
-func (g *Generator) GoType(o *ObservedValue, observations int, imports map[string]bool) (string, bool) {
-	// Determine the number of distinct types observed.
-	distinctTypes := 0
-	if o.Array > 0 {
-		distinctTypes++
-	}
-	if o.Bool > 0 {
-		distinctTypes++
-	}
-	if o.Float64 > 0 {
-		distinctTypes++
-	}
-	if o.Int > 0 {
-		distinctTypes++
-	}
-	if o.Null > 0 {
-		distinctTypes++
-	}
-	if o.Object > 0 {
-		distinctTypes++
-	}
-	if o.String > 0 {
-		distinctTypes++
-	}
+// ObserveValue observes value.
+func (g *Generator) ObserveValue(value any) {
+	g.value = g.value.observe(value)
+}
 
-	// Based on the observed distinct types, find the most specific Go type.
-	switch {
-	case distinctTypes == 1 && o.Array > 0:
-		fallthrough
-	case distinctTypes == 2 && o.Array > 0 && o.Null > 0:
-		elementGoType, _ := g.GoType(o.AllArrayElementValues, 0, imports)
-		return "[]" + elementGoType, o.Array+o.Null < observations && o.Empty == 0
-	case distinctTypes == 1 && o.Bool > 0:
-		return "bool", o.Bool < observations && o.Empty == 0
-	case distinctTypes == 2 && o.Bool > 0 && o.Null > 0:
-		return "*bool", false
-	case distinctTypes == 1 && o.Float64 > 0:
-		return "float64", o.Float64 < observations && o.Empty == 0
-	case distinctTypes == 2 && o.Float64 > 0 && o.Null > 0:
-		return "*float64", false
-	case distinctTypes == 1 && o.Int > 0:
-		return g.intType, o.Int < observations && o.Empty == 0
-	case distinctTypes == 2 && o.Int > 0 && o.Null > 0:
-		return "*" + g.intType, false
-	case distinctTypes == 2 && o.Float64 > 0 && o.Int > 0:
-		omitEmpty := o.Float64+o.Int < observations && o.Empty == 0
-		if g.useJSONNumber {
-			imports["encoding/json"] = true
-			return "json.Number", omitEmpty
-		}
-		return "float64", omitEmpty
-	case distinctTypes == 3 && o.Float64 > 0 && o.Int > 0 && o.Null > 0:
-		if g.useJSONNumber {
-			imports["encoding/json"] = true
-			return "*json.Number", false
-		}
-		return "*float64", false
-	case distinctTypes == 1 && o.Object > 0:
-		fallthrough
-	case distinctTypes == 2 && o.Object > 0 && o.Null > 0:
-		if len(o.ObjectPropertyValue) == 0 {
-			switch {
-			case observations == 0 && o.Null == 0:
-				return "struct{}", false
-			case o.Null > 0:
-				return "*struct{}", false
-			case o.Object == observations:
-				return "struct{}", false
-			default:
-				return "*struct{}", o.Object < observations
-			}
-		}
-		hasUnparseableProperties := false
-		for k := range o.ObjectPropertyValue {
-			if strings.ContainsRune(k, ' ') {
-				hasUnparseableProperties = true
-				break
-			}
-		}
-		if hasUnparseableProperties && !g.skipUnparseableProperties {
-			valueGoType, _ := g.GoType(o.AllObjectPropertyValues, 0, imports)
-			return "map[string]" + valueGoType, o.Object+o.Null < observations
-		}
-		b := &bytes.Buffer{}
-		properties := make([]string, 0, len(o.ObjectPropertyValue))
-		for k := range o.ObjectPropertyValue {
-			properties = append(properties, k)
-		}
-		sort.Strings(properties)
-		fmt.Fprintf(b, "struct {\n")
-		var unparseableProperties []string
-		for _, k := range properties {
-			if isUnparseableProperty(k) {
-				unparseableProperties = append(unparseableProperties, k)
-				continue
-			}
-			goType, observedEmpty := g.GoType(o.ObjectPropertyValue[k], o.Object, imports)
-			var omitEmpty bool
-			switch {
-			case g.omitEmptyOption == OmitEmptyNever:
-				omitEmpty = false
-			case g.omitEmptyOption == OmitEmptyAlways:
-				omitEmpty = true
-			case g.omitEmptyOption == OmitEmptyAuto:
-				omitEmpty = observedEmpty
-			}
-
-			tags, _ := structtag.Parse("")
-			var options []string
-			if omitEmpty {
-				options = append(options, "omitempty")
-			}
-			for _, structTagName := range g.structTagNames {
-				tag := &structtag.Tag{
-					Key:     structTagName,
-					Name:    k,
-					Options: options,
-				}
-				_ = tags.Set(tag)
-			}
-
-			fmt.Fprintf(b, "%s %s `%s`\n", g.fieldNamer.FieldName(k), goType, tags)
-		}
-		for _, k := range unparseableProperties {
-			fmt.Fprintf(b, "// %q cannot be unmarshalled into a struct field by encoding/json.\n", k)
-		}
-		fmt.Fprintf(b, "}")
+// ObserveJSONReader observes JSON values from r.
+func (g *Generator) ObserveJSONReader(r io.Reader) error {
+	decoder := json.NewDecoder(r)
+	decoder.UseNumber()
+	for {
+		var value any
+		err := decoder.Decode(&value)
 		switch {
-		case observations == 0:
-			return b.String(), false
-		case o.Object == observations:
-			return b.String(), false
-		case o.Object < observations && o.Null == 0:
-			return "*" + b.String(), true
+		case errors.Is(err, io.EOF):
+			return nil
+		case err != nil:
+			return err
 		default:
-			return "*" + b.String(), o.Object+o.Null < observations
+			g.ObserveValue(value)
 		}
-	case distinctTypes == 1 && o.String > 0 && o.Time == o.String:
-		imports["time"] = true
-		return "time.Time", o.Time < observations
-	case distinctTypes == 1 && o.String > 0:
-		return "string", o.String < observations && o.Empty == 0
-	case distinctTypes == 2 && o.String > 0 && o.Null > 0 && o.Time == o.String:
-		imports["time"] = true
-		return "*time.Time", false
-	case distinctTypes == 2 && o.String > 0 && o.Null > 0:
-		return "*string", false
-	default:
-		return "interface{}", o.Array+o.Bool+o.Float64+o.Int+o.Null+o.Object+o.String < observations
 	}
+}
+
+// ObserveJSONFile observes JSON values from filename.
+func (g *Generator) ObserveJSONFile(filename string) error {
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	return g.ObserveJSONReader(file)
+}
+
+// ObserveYAMLReader observes YAML values from r.
+func (g *Generator) ObserveYAMLReader(r io.Reader) error {
+	decoder := yaml.NewDecoder(r)
+	for {
+		var value any
+		err := decoder.Decode(&value)
+		switch {
+		case errors.Is(err, io.EOF):
+			return nil
+		case err != nil:
+			return err
+		default:
+			g.ObserveValue(value)
+		}
+	}
+}
+
+// ObserveYAMLFile observes YAML values from filename.
+func (g *Generator) ObserveYAMLFile(filename string) error {
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	return g.ObserveYAMLReader(file)
 }
 
 // isUnparseableProperty returns true if key cannot be parsed by encoding/json.
