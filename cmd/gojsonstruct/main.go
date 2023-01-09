@@ -24,7 +24,7 @@ var (
 	typeName                  = flag.String("typename", "T", "type name")
 	useJSONNumber             = flag.Bool("usejsonnumber", false, "use json.Number")
 	goFormat                  = flag.Bool("goformat", true, "format generated Go code")
-	output                    = flag.String("o", "", "output")
+	output                    = flag.String("o", "", "output filename")
 
 	omitEmptyOption = map[string]jsonstruct.OmitEmptyOption{
 		"never":  jsonstruct.OmitEmptyNever,
