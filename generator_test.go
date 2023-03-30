@@ -8,8 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/alecthomas/assert/v2"
 )
 
 func TestGoType(t *testing.T) {
@@ -724,7 +723,7 @@ func TestGoType(t *testing.T) {
 			goType, _ := generator.value.goType(len(tc.values), options)
 			assert.Equal(t, tc.expectedGoType, goType)
 			if len(tc.expectedImports) == 0 {
-				assert.Empty(t, options.imports)
+				assert.Equal(t, 0, len(options.imports))
 			} else {
 				assert.Equal(t, tc.expectedImports, options.imports)
 			}
@@ -1103,12 +1102,12 @@ func TestObserveJSONGoCode(t *testing.T) {
 			generator := NewGenerator(tc.generatorOptions...)
 			err := generator.ObserveJSONReader(bytes.NewBufferString(tc.json))
 			if tc.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			goCode, err := generator.Generate()
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedGoCodeStr, string(goCode))
 		})
 	}
@@ -1177,12 +1176,12 @@ func TestObserveYAMLGoCode(t *testing.T) {
 			generator := NewGenerator(tc.generatorOptions...)
 			err := generator.ObserveYAMLReader(bytes.NewBufferString(tc.yaml))
 			if tc.wantErr {
-				require.Error(t, err)
+				assert.Error(t, err)
 				return
 			}
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			goCode, err := generator.Generate()
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedGoCodeStr, string(goCode))
 		})
 	}
@@ -1190,12 +1189,12 @@ func TestObserveYAMLGoCode(t *testing.T) {
 
 func TestObserveJSONFileErrors(t *testing.T) {
 	err := NewGenerator().ObserveJSONFile("testdata/notexist.json")
-	require.True(t, errors.Is(err, fs.ErrNotExist))
+	assert.True(t, errors.Is(err, fs.ErrNotExist))
 }
 
 func TestObserveYAMLFileErrors(t *testing.T) {
 	err := NewGenerator().ObserveYAMLFile("testdata/notexist.yaml")
-	require.True(t, errors.Is(err, fs.ErrNotExist))
+	assert.True(t, errors.Is(err, fs.ErrNotExist))
 }
 
 func ExampleGenerator_ObserveJSONFile() {
