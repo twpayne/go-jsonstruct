@@ -3,7 +3,7 @@ package jsonstruct
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/alecthomas/assert/v2"
 )
 
 func TestDefaultExportNameFunc(t *testing.T) {
