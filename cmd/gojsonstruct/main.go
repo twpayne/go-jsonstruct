@@ -57,6 +57,9 @@ func run() error {
 	if *typeName != "" {
 		options = append(options, jsonstruct.WithTypeName(*typeName))
 	}
+	if *format == "yaml" && *structTagName == "" {
+		*structTagName = "yaml"
+	}
 	if *structTagName != "" {
 		options = append(options, jsonstruct.WithStructTagName(*structTagName))
 	}
