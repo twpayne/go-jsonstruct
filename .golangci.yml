@@ -8,7 +8,6 @@ linters:
   - errcheck
   - exhaustive
   - exportloopref
-  - goconst
   - gocritic
   - godot
   - gofmt
@@ -36,6 +35,7 @@ linters:
   - funlen
   - gochecknoglobals
   - gocognit
+  - goconst
   - gocyclo
   - godox
   - goerr113
