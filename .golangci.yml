@@ -1,37 +1,80 @@
 linters:
   enable:
+  - asasalint
   - asciicheck
+  - bidichk
   - bodyclose
+  - containedctx
+  - contextcheck
+  - decorder
   - depguard
   - dogsled
   - dupl
+  - dupword
+  - durationcheck
   - errcheck
+  - errchkjson
+  - errname
+  - errorlint
+  - execinquery
   - exhaustive
   - exportloopref
+  - forcetypeassert
+  - gci
+  - ginkgolinter
+  - gocheckcompilerdirectives
+  - gochecknoinits
   - gocritic
   - godot
   - gofmt
   - gofumpt
+  - goheader
   - goimports
+  - gomoddirectives
   - gomodguard
   - goprintffuncname
   - gosec
   - gosimple
   - govet
+  - grouper
+  - importas
   - ineffassign
+  - interfacebloat
+  - ireturn
+  - loggercheck
+  - makezero
   - misspell
+  - musttag
   - nakedret
+  - nilerr
+  - nilnil
   - noctx
   - nolintlint
+  - nonamedreturns
+  - nosprintfhostport
   - prealloc
+  - predeclared
+  - promlinter
+  - reassign
+  - revive
+  - rowserrcheck
+  - sqlclosecheck
   - staticcheck
   - stylecheck
+  - tagliatelle
+  - tenv
+  - testableexamples
+  - thelper
   - typecheck
   - unconvert
   - unparam
   - unused
+  - usestdlibvars
   - whitespace
   disable:
+  - cyclop
+  - exhaustruct
+  - forbidigo
   - funlen
   - gochecknoglobals
   - gocognit
@@ -41,11 +84,14 @@ linters:
   - goerr113
   - gomnd
   - lll
+  - maintidx
   - maligned
   - nestif
-  - rowserrcheck # https://github.com/golangci/golangci-lint/issues/2649
-  - sqlclosecheck # https://github.com/golangci/golangci-lint/issues/2649
+  - nlreturn
+  - paralleltest
   - testpackage
+  - varnamelen
+  - wrapcheck
   - wsl
 
 linters-settings:
