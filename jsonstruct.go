@@ -10,6 +10,7 @@ import (
 //nolint:gochecknoglobals
 var (
 	defaultAbbreviations = map[string]bool{
+		"ACL":   true,
 		"API":   true,
 		"DB":    true,
 		"HTTP":  true,
@@ -21,6 +22,7 @@ var (
 		"SSH":   true,
 		"URI":   true,
 		"URL":   true,
+		"UUID":  true,
 		"XML":   true,
 		"YAML":  true,
 	}
