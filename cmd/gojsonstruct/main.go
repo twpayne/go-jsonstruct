@@ -22,6 +22,7 @@ var (
 	structTagName             = flag.String("structtagname", "", "struct tag name")
 	typeComment               = flag.String("typecomment", "", "type comment")
 	typeName                  = flag.String("typename", "T", "type name")
+	intType                   = flag.String("inttype", "", "integer type")
 	useJSONNumber             = flag.Bool("usejsonnumber", false, "use json.Number")
 	goFormat                  = flag.Bool("goformat", true, "format generated Go code")
 	output                    = flag.String("o", "", "output filename")
@@ -44,6 +45,9 @@ func run() error {
 	}
 	if *abbreviations != "" {
 		options = append(options, jsonstruct.WithExtraAbbreviations(strings.Split(*abbreviations, ",")...))
+	}
+	if *intType != "" {
+		options = append(options, jsonstruct.WithIntType(*intType))
 	}
 	if *packageComment != "" {
 		options = append(options, jsonstruct.WithPackageComment(*packageComment))
