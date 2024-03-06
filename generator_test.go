@@ -429,7 +429,7 @@ func TestGoType(t *testing.T) {
 				},
 			},
 			generatorOptions: []GeneratorOption{
-				WithOmitEmpty(OmitEmptyAlways),
+				WithOmitEmptyTags(OmitEmptyTagsAlways),
 				WithStringTags(true),
 			},
 			expectedGoTypeStr: "struct {\nKey string `json:\"key,omitempty\"`\n}",
@@ -463,7 +463,7 @@ func TestGoType(t *testing.T) {
 				},
 			},
 			generatorOptions: []GeneratorOption{
-				WithOmitEmpty(OmitEmptyAlways),
+				WithOmitEmptyTags(OmitEmptyTagsAlways),
 				WithStringTags(true),
 			},
 			expectedGoTypeStr: "struct {\nKey bool `json:\"key,omitempty,string\"`\n}",
@@ -832,7 +832,7 @@ func TestGoType(t *testing.T) {
 				},
 			},
 			generatorOptions: []GeneratorOption{
-				WithOmitEmpty(OmitEmptyAlways),
+				WithOmitEmptyTags(OmitEmptyTagsAlways),
 			},
 			expectedGoTypeStr: "struct {\nKey int `json:\"key,omitempty\"`\n}",
 		},
@@ -862,7 +862,7 @@ func TestGoType(t *testing.T) {
 				},
 			},
 			generatorOptions: []GeneratorOption{
-				WithOmitEmpty(OmitEmptyNever),
+				WithOmitEmptyTags(OmitEmptyTagsNever),
 			},
 			expectedGoTypeStr: "struct {\nKey int `json:\"key\"`\n}",
 		},
@@ -899,7 +899,7 @@ func TestGoType(t *testing.T) {
 				},
 			},
 			generatorOptions: []GeneratorOption{
-				WithOmitEmpty(OmitEmptyAuto),
+				WithOmitEmptyTags(OmitEmptyTagsAuto),
 			},
 			expectedGoTypeStr: "struct {\nKey1 int `json:\"key1\"`\nKey2 int `json:\"key2\"`\n}",
 		},
@@ -914,7 +914,7 @@ func TestGoType(t *testing.T) {
 				exportNameFunc:           generator.exportNameFunc,
 				imports:                  make(map[string]struct{}),
 				intType:                  generator.intType,
-				omitEmptyOption:          generator.omitEmptyOption,
+				omitEmptyTags:            generator.omitEmptyTags,
 				skipUnparsableProperties: generator.skipUnparsableProperties,
 				stringTags:               generator.stringTags,
 				structTagNames:           generator.structTagNames,

@@ -17,14 +17,14 @@ import (
 // An ExportNameFunc returns the exported name for a property.
 type ExportNameFunc func(string) string
 
-// An OmitEmptyOption is an option for handling omitempty.
-type OmitEmptyOption int
+// An OmitEmptyTagsType sets how to handle ,omitempty tags.
+type OmitEmptyTagsType int
 
-// omitempty options.
+// OmitEmptyTags values.
 const (
-	OmitEmptyNever OmitEmptyOption = iota
-	OmitEmptyAlways
-	OmitEmptyAuto
+	OmitEmptyTagsNever OmitEmptyTagsType = iota
+	OmitEmptyTagsAlways
+	OmitEmptyTagsAuto
 )
 
 // A Generator generates Go types from observed values.
@@ -35,7 +35,7 @@ type Generator struct {
 	goFormat                 bool
 	imports                  map[string]struct{}
 	intType                  string
-	omitEmptyOption          OmitEmptyOption
+	omitEmptyTags            OmitEmptyTagsType
 	packageComment           string
 	packageName              string
 	skipUnparsableProperties bool
@@ -90,10 +90,10 @@ func WithIntType(intType string) GeneratorOption {
 	}
 }
 
-// WithOmitEmpty sets whether each field is tagged with omitempty.
-func WithOmitEmpty(omitEmptyOption OmitEmptyOption) GeneratorOption {
+// WithOmitEmptyTags sets whether ",omitempty" tags should be used.
+func WithOmitEmptyTags(omitEmptyTags OmitEmptyTagsType) GeneratorOption {
 	return func(g *Generator) {
-		g.omitEmptyOption = omitEmptyOption
+		g.omitEmptyTags = omitEmptyTags
 	}
 }
 
@@ -195,7 +195,7 @@ func NewGenerator(options ...GeneratorOption) *Generator {
 		goFormat:                 true,
 		imports:                  make(map[string]struct{}),
 		intType:                  "int",
-		omitEmptyOption:          OmitEmptyAuto,
+		omitEmptyTags:            OmitEmptyTagsAuto,
 		packageName:              "main",
 		skipUnparsableProperties: true,
 		structTagNames:           []string{"json"},
@@ -228,7 +228,7 @@ func (g *Generator) Generate() ([]byte, error) {
 		exportNameFunc:           g.exportNameFunc,
 		imports:                  imports,
 		intType:                  g.intType,
-		omitEmptyOption:          g.omitEmptyOption,
+		omitEmptyTags:            g.omitEmptyTags,
 		skipUnparsableProperties: g.skipUnparsableProperties,
 		stringTags:               g.stringTags,
 		structTagNames:           g.structTagNames,
