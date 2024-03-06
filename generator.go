@@ -1,6 +1,6 @@
 package jsonstruct
 
-// FIXME move substructs to top level
+// FIXME move sub-structs to top level
 
 import (
 	"bytes"
@@ -32,27 +32,27 @@ const (
 
 // A Generator generates Go types from observed values.
 type Generator struct {
-	abbreviations             map[string]bool
-	exportNameFunc            ExportNameFunc
-	exportRenames             map[string]string
-	goFormat                  bool
-	imports                   map[string]struct{}
-	intType                   string
-	omitEmptyOption           OmitEmptyOption
-	packageComment            string
-	packageName               string
-	skipUnparseableProperties bool
-	structTagNames            []string
-	typeComment               string
-	typeName                  string
-	useJSONNumber             bool
-	value                     *value
+	abbreviations            map[string]bool
+	exportNameFunc           ExportNameFunc
+	exportRenames            map[string]string
+	goFormat                 bool
+	imports                  map[string]struct{}
+	intType                  string
+	omitEmptyOption          OmitEmptyOption
+	packageComment           string
+	packageName              string
+	skipUnparsableProperties bool
+	structTagNames           []string
+	typeComment              string
+	typeName                 string
+	useJSONNumber            bool
+	value                    *value
 }
 
 // A GeneratorOption sets an option on a Generator.
 type GeneratorOption func(*Generator)
 
-// WithAbbreviations sets the abbreviatons.
+// WithAbbreviations sets the abbreviations.
 func WithAbbreviations(abbreviations ...string) GeneratorOption {
 	return func(g *Generator) {
 		g.abbreviations = make(map[string]bool)
@@ -122,11 +122,11 @@ func WithRenames(renames map[string]string) GeneratorOption {
 	}
 }
 
-// WithSkipUnparseableProperties sets whether unparseable properties should be
+// WithSkipUnparsableProperties sets whether unparsable properties should be
 // skipped.
-func WithSkipUnparseableProperties(skipUnparseableProperties bool) GeneratorOption {
+func WithSkipUnparsableProperties(skipUnparsableProperties bool) GeneratorOption {
 	return func(g *Generator) {
-		g.skipUnparseableProperties = skipUnparseableProperties
+		g.skipUnparsableProperties = skipUnparsableProperties
 	}
 }
 
@@ -185,18 +185,18 @@ func WithUseJSONNumber(useJSONNumber bool) GeneratorOption {
 // NewGenerator returns a new Generator with options.
 func NewGenerator(options ...GeneratorOption) *Generator {
 	g := &Generator{
-		abbreviations:             maps.Clone(defaultAbbreviations),
-		exportRenames:             make(map[string]string),
-		goFormat:                  true,
-		imports:                   make(map[string]struct{}),
-		intType:                   "int",
-		omitEmptyOption:           OmitEmptyAuto,
-		packageName:               "main",
-		skipUnparseableProperties: true,
-		structTagNames:            []string{"json"},
-		typeName:                  "T",
-		useJSONNumber:             false,
-		value:                     &value{},
+		abbreviations:            maps.Clone(defaultAbbreviations),
+		exportRenames:            make(map[string]string),
+		goFormat:                 true,
+		imports:                  make(map[string]struct{}),
+		intType:                  "int",
+		omitEmptyOption:          OmitEmptyAuto,
+		packageName:              "main",
+		skipUnparsableProperties: true,
+		structTagNames:           []string{"json"},
+		typeName:                 "T",
+		useJSONNumber:            false,
+		value:                    &value{},
 	}
 	g.exportNameFunc = func(name string) string {
 		if rename, ok := g.exportRenames[name]; ok {
@@ -220,13 +220,13 @@ func (g *Generator) Generate() ([]byte, error) {
 	fmt.Fprintf(buffer, "package %s\n", g.packageName)
 	imports := maps.Clone(g.imports)
 	goType, _ := g.value.goType(0, &generateOptions{
-		exportNameFunc:            g.exportNameFunc,
-		imports:                   imports,
-		intType:                   g.intType,
-		omitEmptyOption:           g.omitEmptyOption,
-		skipUnparseableProperties: g.skipUnparseableProperties,
-		structTagNames:            g.structTagNames,
-		useJSONNumber:             g.useJSONNumber,
+		exportNameFunc:           g.exportNameFunc,
+		imports:                  imports,
+		intType:                  g.intType,
+		omitEmptyOption:          g.omitEmptyOption,
+		skipUnparsableProperties: g.skipUnparsableProperties,
+		structTagNames:           g.structTagNames,
+		useJSONNumber:            g.useJSONNumber,
 	})
 	if len(imports) > 0 {
 		importsSlice := maps.Keys(imports)
@@ -307,7 +307,7 @@ func (g *Generator) ObserveYAMLFile(filename string) error {
 	return g.ObserveYAMLReader(file)
 }
 
-// isUnparseableProperty returns true if key cannot be parsed by encoding/json.
-func isUnparseableProperty(key string) bool {
+// isUnparsableProperty returns true if key cannot be parsed by encoding/json.
+func isUnparsableProperty(key string) bool {
 	return strings.ContainsAny(key, ` ",`)
 }

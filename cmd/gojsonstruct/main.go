@@ -40,7 +40,7 @@ func run() error {
 
 	options := []jsonstruct.GeneratorOption{
 		jsonstruct.WithOmitEmpty(omitEmptyOption[*omitempty]),
-		jsonstruct.WithSkipUnparseableProperties(*skipUnparsableProperties),
+		jsonstruct.WithSkipUnparsableProperties(*skipUnparsableProperties),
 		jsonstruct.WithUseJSONNumber(*useJSONNumber),
 		jsonstruct.WithGoFormat(*goFormat),
 	}

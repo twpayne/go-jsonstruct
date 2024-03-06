@@ -17,7 +17,7 @@ import (
 // An value describes an observed value.
 type value struct {
 	observations        int
-	emptys              int
+	empties             int
 	arrays              int
 	bools               int
 	float64s            int
@@ -32,13 +32,13 @@ type value struct {
 }
 
 type generateOptions struct {
-	exportNameFunc            ExportNameFunc
-	imports                   map[string]struct{}
-	intType                   string
-	omitEmptyOption           OmitEmptyOption
-	skipUnparseableProperties bool
-	structTagNames            []string
-	useJSONNumber             bool
+	exportNameFunc           ExportNameFunc
+	imports                  map[string]struct{}
+	intType                  string
+	omitEmptyOption          OmitEmptyOption
+	skipUnparsableProperties bool
+	structTagNames           []string
+	useJSONNumber            bool
 }
 
 // observe merges a into v.
@@ -51,7 +51,7 @@ func (v *value) observe(a any) *value {
 	case []any:
 		v.arrays++
 		if len(a) == 0 {
-			v.emptys++
+			v.empties++
 		}
 		if v.arrayElements == nil {
 			v.arrayElements = &value{}
@@ -62,24 +62,24 @@ func (v *value) observe(a any) *value {
 	case bool:
 		v.bools++
 		if !a {
-			v.emptys++
+			v.empties++
 		}
 	case float64:
 		v.float64s++
 		if a == 0 {
-			v.emptys++
+			v.empties++
 		}
 	case int:
 		v.ints++
 		if a == 0 {
-			v.emptys++
+			v.empties++
 		}
 	case nil:
 		v.nulls++
 	case map[string]any:
 		v.objects++
 		if len(a) == 0 {
-			v.emptys++
+			v.empties++
 		}
 		if v.objectProperties == nil {
 			v.objectProperties = make(map[string]*value)
@@ -90,7 +90,7 @@ func (v *value) observe(a any) *value {
 		}
 	case string:
 		if a == "" {
-			v.emptys++
+			v.empties++
 		}
 		if v.times == v.strings {
 			if _, err := time.Parse(time.RFC3339Nano, a); err == nil {
@@ -140,21 +140,21 @@ func (v *value) goType(observations int, options *generateOptions) (string, bool
 		fallthrough
 	case distinctTypes == 2 && v.arrays > 0 && v.nulls > 0:
 		elementGoType, _ := v.arrayElements.goType(0, options)
-		return "[]" + elementGoType, v.arrays+v.nulls < observations && v.emptys == 0
+		return "[]" + elementGoType, v.arrays+v.nulls < observations && v.empties == 0
 	case distinctTypes == 1 && v.bools > 0:
-		return "bool", v.bools < observations && v.emptys == 0
+		return "bool", v.bools < observations && v.empties == 0
 	case distinctTypes == 2 && v.bools > 0 && v.nulls > 0:
 		return "*bool", false
 	case distinctTypes == 1 && v.float64s > 0:
-		return "float64", v.float64s < observations && v.emptys == 0
+		return "float64", v.float64s < observations && v.empties == 0
 	case distinctTypes == 2 && v.float64s > 0 && v.nulls > 0:
 		return "*float64", false
 	case distinctTypes == 1 && v.ints > 0:
-		return options.intType, v.ints < observations && v.emptys == 0
+		return options.intType, v.ints < observations && v.empties == 0
 	case distinctTypes == 2 && v.ints > 0 && v.nulls > 0:
 		return "*" + options.intType, false
 	case distinctTypes == 2 && v.float64s > 0 && v.ints > 0:
-		omitEmpty := v.float64s+v.ints < observations && v.emptys == 0
+		omitEmpty := v.float64s+v.ints < observations && v.empties == 0
 		if options.useJSONNumber {
 			options.imports["encoding/json"] = struct{}{}
 			return "json.Number", omitEmpty
@@ -181,14 +181,14 @@ func (v *value) goType(observations int, options *generateOptions) (string, bool
 				return "*struct{}", v.objects < observations
 			}
 		}
-		hasUnparseableProperties := false
+		hasUnparsableProperties := false
 		for k := range v.objectProperties {
 			if strings.ContainsRune(k, ' ') {
-				hasUnparseableProperties = true
+				hasUnparsableProperties = true
 				break
 			}
 		}
-		if hasUnparseableProperties && !options.skipUnparseableProperties {
+		if hasUnparsableProperties && !options.skipUnparsableProperties {
 			valueGoType, _ := v.allObjectProperties.goType(0, options)
 			return "map[string]" + valueGoType, v.objects+v.nulls < observations
 		}
@@ -196,10 +196,10 @@ func (v *value) goType(observations int, options *generateOptions) (string, bool
 		properties := maps.Keys(v.objectProperties)
 		sort.Strings(properties)
 		fmt.Fprintf(b, "struct {\n")
-		var unparseableProperties []string
+		var unparsableProperties []string
 		for _, property := range properties {
-			if isUnparseableProperty(property) {
-				unparseableProperties = append(unparseableProperties, property)
+			if isUnparsableProperty(property) {
+				unparsableProperties = append(unparsableProperties, property)
 				continue
 			}
 			goType, observedEmpty := v.objectProperties[property].goType(v.objects, options)
@@ -229,7 +229,7 @@ func (v *value) goType(observations int, options *generateOptions) (string, bool
 
 			fmt.Fprintf(b, "%s %s `%s`\n", options.exportNameFunc(property), goType, tags)
 		}
-		for _, property := range unparseableProperties {
+		for _, property := range unparsableProperties {
 			fmt.Fprintf(b, "// %q cannot be unmarshalled into a struct field by encoding/json.\n", property)
 		}
 		fmt.Fprintf(b, "}")
@@ -247,7 +247,7 @@ func (v *value) goType(observations int, options *generateOptions) (string, bool
 		options.imports["time"] = struct{}{}
 		return "time.Time", v.times < observations
 	case distinctTypes == 1 && v.strings > 0:
-		return "string", v.strings < observations && v.emptys == 0
+		return "string", v.strings < observations && v.empties == 0
 	case distinctTypes == 2 && v.strings > 0 && v.nulls > 0 && v.times == v.strings:
 		options.imports["time"] = struct{}{}
 		return "*time.Time", false

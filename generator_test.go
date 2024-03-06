@@ -27,7 +27,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations:  1,
-				emptys:        1,
+				empties:       1,
 				arrays:        1,
 				arrayElements: &value{},
 			},
@@ -45,7 +45,7 @@ func TestGoType(t *testing.T) {
 				arrays:       1,
 				arrayElements: &value{
 					observations: 1,
-					emptys:       1,
+					empties:      1,
 					bools:        1,
 				},
 			},
@@ -58,7 +58,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 1,
-				emptys:       1,
+				empties:      1,
 				bools:        1,
 			},
 			expectedGoType: "bool",
@@ -82,7 +82,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 2,
-				emptys:       1,
+				empties:      1,
 				bools:        1,
 				nulls:        1,
 			},
@@ -95,7 +95,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 1,
-				emptys:       1,
+				empties:      1,
 				float64s:     1,
 			},
 			expectedGoType: "float64",
@@ -119,7 +119,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 2,
-				emptys:       1,
+				empties:      1,
 				float64s:     1,
 				nulls:        1,
 			},
@@ -132,7 +132,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 1,
-				emptys:       1,
+				empties:      1,
 				ints:         1,
 			},
 			expectedGoType: "int",
@@ -156,7 +156,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 2,
-				emptys:       1,
+				empties:      1,
 				ints:         1,
 				nulls:        1,
 			},
@@ -169,7 +169,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 1,
-				emptys:       1,
+				empties:      1,
 				ints:         1,
 			},
 			generatorOptions: []GeneratorOption{
@@ -184,7 +184,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 1,
-				emptys:       1,
+				empties:      1,
 				ints:         1,
 			},
 			generatorOptions: []GeneratorOption{
@@ -200,7 +200,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 2,
-				emptys:       2,
+				empties:      2,
 				float64s:     1,
 				ints:         1,
 			},
@@ -214,7 +214,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 2,
-				emptys:       2,
+				empties:      2,
 				float64s:     1,
 				ints:         1,
 			},
@@ -235,7 +235,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 3,
-				emptys:       2,
+				empties:      2,
 				float64s:     1,
 				ints:         1,
 				nulls:        1,
@@ -251,7 +251,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 3,
-				emptys:       2,
+				empties:      2,
 				float64s:     1,
 				ints:         1,
 				nulls:        1,
@@ -271,7 +271,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations:     1,
-				emptys:           1,
+				empties:          1,
 				objects:          1,
 				objectProperties: map[string]*value{},
 			},
@@ -285,7 +285,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations:     2,
-				emptys:           1,
+				empties:          1,
 				nulls:            1,
 				objects:          1,
 				objectProperties: map[string]*value{},
@@ -305,13 +305,13 @@ func TestGoType(t *testing.T) {
 				objectProperties: map[string]*value{
 					"key": {
 						observations: 1,
-						emptys:       1,
+						empties:      1,
 						bools:        1,
 					},
 				},
 				allObjectProperties: &value{
 					observations: 1,
-					emptys:       1,
+					empties:      1,
 					bools:        1,
 				},
 			},
@@ -367,7 +367,7 @@ func TestGoType(t *testing.T) {
 			expectedGoType: "struct {\nKey int64 `json:\"key\"`\n}",
 		},
 		{
-			name: "object_unparseable_properties_skip",
+			name: "object_unparsable_properties_skip",
 			values: []any{
 				map[string]any{
 					"key with spaces": false,
@@ -379,20 +379,20 @@ func TestGoType(t *testing.T) {
 				objectProperties: map[string]*value{
 					"key with spaces": {
 						observations: 1,
-						emptys:       1,
+						empties:      1,
 						bools:        1,
 					},
 				},
 				allObjectProperties: &value{
 					observations: 1,
-					emptys:       1,
+					empties:      1,
 					bools:        1,
 				},
 			},
 			expectedGoType: "struct {\n// \"key with spaces\" cannot be unmarshalled into a struct field by encoding/json.\n}",
 		},
 		{
-			name: "object_unparseable_properties",
+			name: "object_unparsable_properties",
 			values: []any{
 				map[string]any{
 					"key with spaces":         false,
@@ -405,7 +405,7 @@ func TestGoType(t *testing.T) {
 				objectProperties: map[string]*value{
 					"key with spaces": {
 						observations: 1,
-						emptys:       1,
+						empties:      1,
 						bools:        1,
 					},
 					"another key with spaces": {
@@ -415,17 +415,17 @@ func TestGoType(t *testing.T) {
 				},
 				allObjectProperties: &value{
 					observations: 2,
-					emptys:       1,
+					empties:      1,
 					bools:        2,
 				},
 			},
 			generatorOptions: []GeneratorOption{
-				WithSkipUnparseableProperties(false),
+				WithSkipUnparsableProperties(false),
 			},
 			expectedGoType: "map[string]bool",
 		},
 		{
-			name: "object_unparseable_properties_variable_values",
+			name: "object_unparsable_properties_variable_values",
 			values: []any{
 				map[string]any{
 					"key with spaces":         false,
@@ -438,24 +438,24 @@ func TestGoType(t *testing.T) {
 				objectProperties: map[string]*value{
 					"key with spaces": {
 						observations: 1,
-						emptys:       1,
+						empties:      1,
 						bools:        1,
 					},
 					"another key with spaces": {
 						observations: 1,
-						emptys:       1,
+						empties:      1,
 						ints:         1,
 					},
 				},
 				allObjectProperties: &value{
 					observations: 2,
-					emptys:       2,
+					empties:      2,
 					bools:        1,
 					ints:         1,
 				},
 			},
 			generatorOptions: []GeneratorOption{
-				WithSkipUnparseableProperties(false),
+				WithSkipUnparsableProperties(false),
 			},
 			expectedGoType: "map[string]any",
 		},
@@ -489,7 +489,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 1,
-				emptys:       1,
+				empties:      1,
 				strings:      1,
 			},
 			expectedGoType: "string",
@@ -513,7 +513,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 2,
-				emptys:       1,
+				empties:      1,
 				strings:      1,
 				nulls:        1,
 			},
@@ -559,7 +559,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 2,
-				emptys:       1,
+				empties:      1,
 				strings:      2,
 				times:        1,
 			},
@@ -574,7 +574,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 3,
-				emptys:       1,
+				empties:      1,
 				nulls:        1,
 				strings:      2,
 				times:        1,
@@ -594,13 +594,13 @@ func TestGoType(t *testing.T) {
 				objectProperties: map[string]*value{
 					"gpsAltitude": {
 						observations: 1,
-						emptys:       1,
+						empties:      1,
 						ints:         1,
 					},
 				},
 				allObjectProperties: &value{
 					observations: 1,
-					emptys:       1,
+					empties:      1,
 					ints:         1,
 				},
 			},
@@ -622,13 +622,13 @@ func TestGoType(t *testing.T) {
 				objectProperties: map[string]*value{
 					"key": {
 						observations: 1,
-						emptys:       1,
+						empties:      1,
 						ints:         1,
 					},
 				},
 				allObjectProperties: &value{
 					observations: 1,
-					emptys:       1,
+					empties:      1,
 					ints:         1,
 				},
 			},
@@ -647,18 +647,18 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 2,
-				emptys:       1,
+				empties:      1,
 				objects:      2,
 				objectProperties: map[string]*value{
 					"key": {
 						observations: 1,
-						emptys:       1,
+						empties:      1,
 						ints:         1,
 					},
 				},
 				allObjectProperties: &value{
 					observations: 1,
-					emptys:       1,
+					empties:      1,
 					ints:         1,
 				},
 			},
@@ -684,18 +684,18 @@ func TestGoType(t *testing.T) {
 				objectProperties: map[string]*value{
 					"key1": {
 						observations: 2,
-						emptys:       2,
+						empties:      2,
 						ints:         2,
 					},
 					"key2": {
 						observations: 1,
-						emptys:       1,
+						empties:      1,
 						ints:         1,
 					},
 				},
 				allObjectProperties: &value{
 					observations: 3,
-					emptys:       3,
+					empties:      3,
 					ints:         3,
 				},
 			},
@@ -712,13 +712,13 @@ func TestGoType(t *testing.T) {
 			}
 			assert.Equal(t, tc.expectedValue, generator.value)
 			options := &generateOptions{
-				exportNameFunc:            generator.exportNameFunc,
-				imports:                   make(map[string]struct{}),
-				intType:                   generator.intType,
-				omitEmptyOption:           generator.omitEmptyOption,
-				skipUnparseableProperties: generator.skipUnparseableProperties,
-				structTagNames:            generator.structTagNames,
-				useJSONNumber:             generator.useJSONNumber,
+				exportNameFunc:           generator.exportNameFunc,
+				imports:                  make(map[string]struct{}),
+				intType:                  generator.intType,
+				omitEmptyOption:          generator.omitEmptyOption,
+				skipUnparsableProperties: generator.skipUnparsableProperties,
+				structTagNames:           generator.structTagNames,
+				useJSONNumber:            generator.useJSONNumber,
 			}
 			goType, _ := generator.value.goType(len(tc.values), options)
 			assert.Equal(t, tc.expectedGoType, goType)
@@ -1188,12 +1188,12 @@ func TestObserveYAMLGoCode(t *testing.T) {
 }
 
 func TestObserveJSONFileErrors(t *testing.T) {
-	err := NewGenerator().ObserveJSONFile("testdata/notexist.json")
+	err := NewGenerator().ObserveJSONFile("testdata/not_exist.json")
 	assert.True(t, errors.Is(err, fs.ErrNotExist))
 }
 
 func TestObserveYAMLFileErrors(t *testing.T) {
-	err := NewGenerator().ObserveYAMLFile("testdata/notexist.yaml")
+	err := NewGenerator().ObserveYAMLFile("testdata/not_exist.yaml")
 	assert.True(t, errors.Is(err, fs.ErrNotExist))
 }
 
