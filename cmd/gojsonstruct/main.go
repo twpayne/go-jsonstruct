@@ -2,30 +2,31 @@ package main
 
 import (
 	"compress/gzip"
-	"flag"
 	"fmt"
 	"io"
 	"os"
 	"strings"
 
+	"github.com/spf13/pflag"
+
 	"github.com/twpayne/go-jsonstruct/v2"
 )
 
 var (
-	abbreviations             = flag.String("abbreviations", "", "comma-separated list of extra abbreviations")
-	format                    = flag.String("format", "json", "format (json or yaml)")
-	uncompress                = flag.Bool("z", false, "decompress input with gzip")
-	omitempty                 = flag.String("omitempty", "auto", "generate omitempty (never, always, or auto)")
-	packageComment            = flag.String("packagecomment", "", "package comment")
-	packageName               = flag.String("packagename", "main", "package name")
-	skipUnparseableProperties = flag.Bool("skipunparseableproperties", true, "skip unparseable properties")
-	structTagName             = flag.String("structtagname", "", "struct tag name")
-	typeComment               = flag.String("typecomment", "", "type comment")
-	typeName                  = flag.String("typename", "T", "type name")
-	intType                   = flag.String("inttype", "", "integer type")
-	useJSONNumber             = flag.Bool("usejsonnumber", false, "use json.Number")
-	goFormat                  = flag.Bool("goformat", true, "format generated Go code")
-	output                    = flag.String("o", "", "output filename")
+	abbreviations            = pflag.String("abbreviations", "", "comma-separated list of extra abbreviations")
+	format                   = pflag.String("format", "json", "format (json or yaml)")
+	decompress               = pflag.Bool("z", false, "decompress input with gzip")
+	omitempty                = pflag.String("omitempty", "auto", "generate omitempty (never, always, or auto)")
+	packageComment           = pflag.String("package-comment", "", "package comment")
+	packageName              = pflag.String("package-name", "main", "package name")
+	skipUnparsableProperties = pflag.Bool("skip-unparsable-properties", true, "skip unparsable properties")
+	structTagName            = pflag.String("struct-tag-name", "", "struct tag name")
+	typeComment              = pflag.String("type-comment", "", "type comment")
+	typeName                 = pflag.String("typename", "T", "type name")
+	intType                  = pflag.String("int-type", "", "integer type")
+	useJSONNumber            = pflag.Bool("use-json-number", false, "use json.Number")
+	goFormat                 = pflag.Bool("go-format", true, "format generated Go code")
+	output                   = pflag.String("o", "", "output filename")
 
 	omitEmptyOption = map[string]jsonstruct.OmitEmptyOption{
 		"never":  jsonstruct.OmitEmptyNever,
@@ -35,11 +36,11 @@ var (
 )
 
 func run() error {
-	flag.Parse()
+	pflag.Parse()
 
 	options := []jsonstruct.GeneratorOption{
 		jsonstruct.WithOmitEmpty(omitEmptyOption[*omitempty]),
-		jsonstruct.WithSkipUnparseableProperties(*skipUnparseableProperties),
+		jsonstruct.WithSkipUnparsableProperties(*skipUnparsableProperties),
 		jsonstruct.WithUseJSONNumber(*useJSONNumber),
 		jsonstruct.WithGoFormat(*goFormat),
 	}
@@ -70,9 +71,9 @@ func run() error {
 
 	generator := jsonstruct.NewGenerator(options...)
 
-	if flag.NArg() == 0 {
+	if pflag.NArg() == 0 {
 		var input io.Reader = os.Stdin
-		if *uncompress {
+		if *decompress {
 			var err error
 			input, err = gzip.NewReader(input)
 			if err != nil {
@@ -95,13 +96,13 @@ func run() error {
 	} else {
 		switch *format {
 		case "json":
-			for _, arg := range flag.Args() {
+			for _, arg := range pflag.Args() {
 				if err := generator.ObserveJSONFile(arg); err != nil {
 					return err
 				}
 			}
 		case "yaml":
-			for _, arg := range flag.Args() {
+			for _, arg := range pflag.Args() {
 				if err := generator.ObserveYAMLFile(arg); err != nil {
 					return err
 				}

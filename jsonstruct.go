@@ -32,12 +32,16 @@ var (
 func DefaultExportNameFunc(name string, abbreviations map[string]bool) string {
 	components := SplitComponents(name)
 	for i, component := range components {
+		componentUpper := strings.ToUpper(component)
+		singularUpper, singularUpperOK := englishSingular(componentUpper)
 		switch {
 		case component == "":
 			// do nothing
-		case abbreviations[strings.ToUpper(component)]:
-			components[i] = strings.ToUpper(component)
-		case component == strings.ToUpper(component):
+		case abbreviations[componentUpper]:
+			components[i] = componentUpper
+		case singularUpperOK && abbreviations[singularUpper]:
+			components[i] = englishPlural(singularUpper)
+		case component == componentUpper:
 			runes := []rune(component)
 			components[i] = string(runes[0]) + strings.ToLower(string(runes[1:]))
 		default:
@@ -70,4 +74,18 @@ func SplitComponents(name string) []string {
 	default:
 		return camelcase.Split(name)
 	}
+}
+
+func englishPlural(nounUpper string) string {
+	if strings.HasSuffix(nounUpper, "S") {
+		return nounUpper + "es"
+	}
+	return nounUpper + "s"
+}
+
+func englishSingular(nounUpper string) (string, bool) {
+	if singular, ok := strings.CutSuffix(nounUpper, "SES"); ok {
+		return singular + "S", ok
+	}
+	return strings.CutSuffix(nounUpper, "S")
 }

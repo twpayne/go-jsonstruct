@@ -7,16 +7,24 @@ import (
 )
 
 func TestDefaultExportNameFunc(t *testing.T) {
-	for name, expected := range map[string]string{
-		"id":         "ID",
-		"foo":        "Foo",
-		"foo_bar":    "FooBar",
-		"fooBar":     "FooBar",
-		"FOO_BAR":    "FooBar",
-		"FOO_BAR_ID": "FooBarID",
-		"123":        "_123",
-		"A|B":        "A_B",
-	} {
-		assert.Equal(t, expected, DefaultExportNameFunc(name, defaultAbbreviations))
+	expected := map[string]string{
+		"FOO_BAR":          "FooBar",
+		"FOO_BAR_ID":       "FooBarID",
+		"LIST_OF_OSES":     "ListOfOSes",
+		"foo":              "Foo",
+		"fooBar":           "FooBar",
+		"foo_bar":          "FooBar",
+		"https_urls":       "HTTPSURLs",
+		"id":               "ID",
+		"ids":              "IDs",
+		"urls_to_download": "URLsToDownload",
+		"user_acls":        "UserACLs",
+		"123":              "_123",
+		"A|B":              "A_B",
+	}
+	for _, name := range sortedKeys(expected) {
+		t.Run(name, func(t *testing.T) {
+			assert.Equal(t, expected[name], DefaultExportNameFunc(name, defaultAbbreviations))
+		})
 	}
 }

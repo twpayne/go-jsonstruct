@@ -7,7 +7,6 @@ linters:
   - containedctx
   - contextcheck
   - decorder
-  - depguard
   - dogsled
   - dupl
   - dupword
@@ -73,6 +72,7 @@ linters:
   - whitespace
   disable:
   - cyclop
+  - depguard
   - exhaustruct
   - forbidigo
   - funlen
@@ -95,6 +95,14 @@ linters:
   - wsl
 
 linters-settings:
+  gci:
+    sections:
+    - standard
+    - default
+    - prefix(github.com/twpayne/go-jsonstruct)
+  gofumpt:
+    extra-rules: true
+    module-path: github.com/twpayne/go-jsonstruct
   goimports:
     local-prefixes: github.com/twpayne/go-jsonstruct
 
