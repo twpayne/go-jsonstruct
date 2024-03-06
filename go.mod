@@ -1,4 +1,4 @@
-module github.com/twpayne/go-jsonstruct/v2
+module github.com/twpayne/go-jsonstruct/v3
 
 go 1.21
 
