@@ -9,7 +9,7 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/twpayne/go-jsonstruct/v2"
+	"github.com/twpayne/go-jsonstruct/v3"
 )
 
 var (
