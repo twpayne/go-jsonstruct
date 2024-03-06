@@ -4,12 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"sort"
 	"strings"
 	"time"
 
 	"github.com/fatih/structtag"
-	"golang.org/x/exp/maps"
 )
 
 // FIXME extract sub-structs
@@ -193,8 +191,7 @@ func (v *value) goType(observations int, options *generateOptions) (string, bool
 			return "map[string]" + valueGoType, v.objects+v.nulls < observations
 		}
 		b := &bytes.Buffer{}
-		properties := maps.Keys(v.objectProperties)
-		sort.Strings(properties)
+		properties := sortedKeys(v.objectProperties)
 		fmt.Fprintf(b, "struct {\n")
 		var unparsableProperties []string
 		for _, property := range properties {

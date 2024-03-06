@@ -9,11 +9,10 @@ import (
 	"fmt"
 	"go/format"
 	"io"
+	"maps"
 	"os"
-	"sort"
 	"strings"
 
-	"golang.org/x/exp/maps"
 	"gopkg.in/yaml.v3"
 )
 
@@ -229,8 +228,7 @@ func (g *Generator) Generate() ([]byte, error) {
 		useJSONNumber:            g.useJSONNumber,
 	})
 	if len(imports) > 0 {
-		importsSlice := maps.Keys(imports)
-		sort.Strings(importsSlice)
+		importsSlice := sortedKeys(imports)
 		fmt.Fprintf(buffer, "import (\n")
 		for _, _import := range importsSlice {
 			fmt.Fprintf(buffer, "\"%s\"\n", _import)
