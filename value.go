@@ -34,7 +34,7 @@ type generateOptions struct {
 	exportNameFunc           ExportNameFunc
 	imports                  map[string]struct{}
 	intType                  string
-	omitEmptyOption          OmitEmptyOption
+	omitEmptyTags            OmitEmptyTagsType
 	skipUnparsableProperties bool
 	stringTags               bool
 	structTagNames           []string
@@ -258,11 +258,11 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 			goType := v.objectProperties[property].goType(v.objects, options)
 			var omitEmpty bool
 			switch {
-			case options.omitEmptyOption == OmitEmptyNever:
+			case options.omitEmptyTags == OmitEmptyTagsNever:
 				omitEmpty = false
-			case options.omitEmptyOption == OmitEmptyAlways:
+			case options.omitEmptyTags == OmitEmptyTagsAlways:
 				omitEmpty = true
-			case options.omitEmptyOption == OmitEmptyAuto:
+			case options.omitEmptyTags == OmitEmptyTagsAuto:
 				omitEmpty = goType.omitEmpty
 			}
 

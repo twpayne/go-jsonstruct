@@ -16,7 +16,7 @@ var (
 	abbreviations            = pflag.String("abbreviations", "", "comma-separated list of extra abbreviations")
 	format                   = pflag.String("format", "json", "format (json or yaml)")
 	decompress               = pflag.Bool("z", false, "decompress input with gzip")
-	omitempty                = pflag.String("omitempty", "auto", "generate omitempty (never, always, or auto)")
+	omitEmptyTags            = pflag.String("omitempty-tags", "auto", "generate ,omitempty tags (never, always, or auto)")
 	packageComment           = pflag.String("package-comment", "", "package comment")
 	packageName              = pflag.String("package-name", "main", "package name")
 	skipUnparsableProperties = pflag.Bool("skip-unparsable-properties", true, "skip unparsable properties")
@@ -29,10 +29,10 @@ var (
 	goFormat                 = pflag.Bool("go-format", true, "format generated Go code")
 	output                   = pflag.String("o", "", "output filename")
 
-	omitEmptyOption = map[string]jsonstruct.OmitEmptyOption{
-		"never":  jsonstruct.OmitEmptyNever,
-		"always": jsonstruct.OmitEmptyAlways,
-		"auto":   jsonstruct.OmitEmptyAuto,
+	omitEmptyTagsType = map[string]jsonstruct.OmitEmptyTagsType{
+		"never":  jsonstruct.OmitEmptyTagsNever,
+		"always": jsonstruct.OmitEmptyTagsAlways,
+		"auto":   jsonstruct.OmitEmptyTagsAuto,
 	}
 )
 
@@ -40,7 +40,7 @@ func run() error {
 	pflag.Parse()
 
 	options := []jsonstruct.GeneratorOption{
-		jsonstruct.WithOmitEmpty(omitEmptyOption[*omitempty]),
+		jsonstruct.WithOmitEmptyTags(omitEmptyTagsType[*omitEmptyTags]),
 		jsonstruct.WithSkipUnparsableProperties(*skipUnparsableProperties),
 		jsonstruct.WithStringTags(*stringTags),
 		jsonstruct.WithUseJSONNumber(*useJSONNumber),

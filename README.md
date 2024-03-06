@@ -173,7 +173,7 @@ To learn about more about the available options, run:
 * Generates deterministic output based only on the determined structure of the
   input, making it suitable for incorporation into build pipelines or detecting
   schema changes.
-* Generates `omitempty` when possible.
+* Generates `,omitempty` tags.
 * Generates `,string` tags.
 * Uses the standard library's `time.Time` when possible.
 * Gracefully handles properties with spaces that [cannot be unmarshalled by
