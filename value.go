@@ -10,8 +10,6 @@ import (
 	"github.com/fatih/structtag"
 )
 
-// FIXME extract sub-structs
-
 // An value describes an observed value.
 type value struct {
 	observations        int

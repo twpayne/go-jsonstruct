@@ -1,7 +1,5 @@
 package jsonstruct
 
-// FIXME move sub-structs to top level
-
 import (
 	"bytes"
 	"encoding/json"
