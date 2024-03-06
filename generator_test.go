@@ -13,12 +13,12 @@ import (
 
 func TestGoType(t *testing.T) {
 	for _, tc := range []struct {
-		name             string
-		values           []any
-		expectedValue    *value
-		generatorOptions []GeneratorOption
-		expectedGoType   string
-		expectedImports  map[string]struct{}
+		name              string
+		values            []any
+		expectedValue     *value
+		generatorOptions  []GeneratorOption
+		expectedGoTypeStr string
+		expectedImports   map[string]struct{}
 	}{
 		{
 			name: "slice_empty",
@@ -31,7 +31,7 @@ func TestGoType(t *testing.T) {
 				arrays:        1,
 				arrayElements: &value{},
 			},
-			expectedGoType: "[]any",
+			expectedGoTypeStr: "[]any",
 		},
 		{
 			name: "slice_bool",
@@ -49,7 +49,7 @@ func TestGoType(t *testing.T) {
 					bools:        1,
 				},
 			},
-			expectedGoType: "[]bool",
+			expectedGoTypeStr: "[]bool",
 		},
 		{
 			name: "bool_false",
@@ -61,7 +61,7 @@ func TestGoType(t *testing.T) {
 				empties:      1,
 				bools:        1,
 			},
-			expectedGoType: "bool",
+			expectedGoTypeStr: "bool",
 		},
 		{
 			name: "bool_true",
@@ -72,7 +72,7 @@ func TestGoType(t *testing.T) {
 				observations: 1,
 				bools:        1,
 			},
-			expectedGoType: "bool",
+			expectedGoTypeStr: "bool",
 		},
 		{
 			name: "bool_and_null",
@@ -86,7 +86,7 @@ func TestGoType(t *testing.T) {
 				bools:        1,
 				nulls:        1,
 			},
-			expectedGoType: "*bool",
+			expectedGoTypeStr: "*bool",
 		},
 		{
 			name: "float64_zero",
@@ -98,7 +98,7 @@ func TestGoType(t *testing.T) {
 				empties:      1,
 				float64s:     1,
 			},
-			expectedGoType: "float64",
+			expectedGoTypeStr: "float64",
 		},
 		{
 			name: "float64_nonzero",
@@ -109,7 +109,7 @@ func TestGoType(t *testing.T) {
 				observations: 1,
 				float64s:     1,
 			},
-			expectedGoType: "float64",
+			expectedGoTypeStr: "float64",
 		},
 		{
 			name: "float64_and_null",
@@ -123,7 +123,7 @@ func TestGoType(t *testing.T) {
 				float64s:     1,
 				nulls:        1,
 			},
-			expectedGoType: "*float64",
+			expectedGoTypeStr: "*float64",
 		},
 		{
 			name: "int_zero",
@@ -135,7 +135,7 @@ func TestGoType(t *testing.T) {
 				empties:      1,
 				ints:         1,
 			},
-			expectedGoType: "int",
+			expectedGoTypeStr: "int",
 		},
 		{
 			name: "int_nonzero",
@@ -146,7 +146,7 @@ func TestGoType(t *testing.T) {
 				observations: 1,
 				ints:         1,
 			},
-			expectedGoType: "int",
+			expectedGoTypeStr: "int",
 		},
 		{
 			name: "int_and_null",
@@ -160,7 +160,7 @@ func TestGoType(t *testing.T) {
 				ints:         1,
 				nulls:        1,
 			},
-			expectedGoType: "*int",
+			expectedGoTypeStr: "*int",
 		},
 		{
 			name: "int32_zero",
@@ -175,7 +175,7 @@ func TestGoType(t *testing.T) {
 			generatorOptions: []GeneratorOption{
 				WithIntType("int32"),
 			},
-			expectedGoType: "int32",
+			expectedGoTypeStr: "int32",
 		},
 		{
 			name: "int64_zero",
@@ -190,7 +190,7 @@ func TestGoType(t *testing.T) {
 			generatorOptions: []GeneratorOption{
 				WithIntType("int64"),
 			},
-			expectedGoType: "int64",
+			expectedGoTypeStr: "int64",
 		},
 		{
 			name: "float64_and_int",
@@ -204,7 +204,7 @@ func TestGoType(t *testing.T) {
 				float64s:     1,
 				ints:         1,
 			},
-			expectedGoType: "float64",
+			expectedGoTypeStr: "float64",
 		},
 		{
 			name: "float64_and_int_json_number",
@@ -221,7 +221,7 @@ func TestGoType(t *testing.T) {
 			generatorOptions: []GeneratorOption{
 				WithUseJSONNumber(true),
 			},
-			expectedGoType: "json.Number",
+			expectedGoTypeStr: "json.Number",
 			expectedImports: map[string]struct{}{
 				"encoding/json": {},
 			},
@@ -240,7 +240,7 @@ func TestGoType(t *testing.T) {
 				ints:         1,
 				nulls:        1,
 			},
-			expectedGoType: "*float64",
+			expectedGoTypeStr: "*float64",
 		},
 		{
 			name: "float64_and_int_and_null_json_number",
@@ -259,7 +259,7 @@ func TestGoType(t *testing.T) {
 			generatorOptions: []GeneratorOption{
 				WithUseJSONNumber(true),
 			},
-			expectedGoType: "*json.Number",
+			expectedGoTypeStr: "*json.Number",
 			expectedImports: map[string]struct{}{
 				"encoding/json": {},
 			},
@@ -275,7 +275,7 @@ func TestGoType(t *testing.T) {
 				objects:          1,
 				objectProperties: map[string]*value{},
 			},
-			expectedGoType: "struct{}",
+			expectedGoTypeStr: "struct{}",
 		},
 		{
 			name: "object_and_null",
@@ -290,7 +290,7 @@ func TestGoType(t *testing.T) {
 				objects:          1,
 				objectProperties: map[string]*value{},
 			},
-			expectedGoType: "*struct{}",
+			expectedGoTypeStr: "*struct{}",
 		},
 		{
 			name: "object_simple",
@@ -315,7 +315,7 @@ func TestGoType(t *testing.T) {
 					bools:        1,
 				},
 			},
-			expectedGoType: "struct {\nKey bool `json:\"key\"`\n}",
+			expectedGoTypeStr: "struct {\nKey bool `json:\"key\"`\n}",
 		},
 		{
 			name: "object_with_nested_int",
@@ -338,7 +338,7 @@ func TestGoType(t *testing.T) {
 					ints:         1,
 				},
 			},
-			expectedGoType: "struct {\nKey int `json:\"key\"`\n}",
+			expectedGoTypeStr: "struct {\nKey int `json:\"key\"`\n}",
 		},
 		{
 			name: "object_with_nested_int_and_int64_option",
@@ -364,7 +364,7 @@ func TestGoType(t *testing.T) {
 			generatorOptions: []GeneratorOption{
 				WithIntType("int64"),
 			},
-			expectedGoType: "struct {\nKey int64 `json:\"key\"`\n}",
+			expectedGoTypeStr: "struct {\nKey int64 `json:\"key\"`\n}",
 		},
 		{
 			name: "object_unparsable_properties_skip",
@@ -389,7 +389,7 @@ func TestGoType(t *testing.T) {
 					bools:        1,
 				},
 			},
-			expectedGoType: "struct {\n// \"key with spaces\" cannot be unmarshalled into a struct field by encoding/json.\n}",
+			expectedGoTypeStr: "struct {\n// \"key with spaces\" cannot be unmarshalled into a struct field by encoding/json.\n}",
 		},
 		{
 			name: "object_unparsable_properties",
@@ -422,7 +422,7 @@ func TestGoType(t *testing.T) {
 			generatorOptions: []GeneratorOption{
 				WithSkipUnparsableProperties(false),
 			},
-			expectedGoType: "map[string]bool",
+			expectedGoTypeStr: "map[string]bool",
 		},
 		{
 			name: "object_unparsable_properties_variable_values",
@@ -457,7 +457,7 @@ func TestGoType(t *testing.T) {
 			generatorOptions: []GeneratorOption{
 				WithSkipUnparsableProperties(false),
 			},
-			expectedGoType: "map[string]any",
+			expectedGoTypeStr: "map[string]any",
 		},
 		{
 			name: "object_kebab_case",
@@ -480,7 +480,7 @@ func TestGoType(t *testing.T) {
 					bools:        1,
 				},
 			},
-			expectedGoType: "struct {\nKebabCase bool `json:\"kebab-case\"`\n}",
+			expectedGoTypeStr: "struct {\nKebabCase bool `json:\"kebab-case\"`\n}",
 		},
 		{
 			name: "string_empty",
@@ -492,7 +492,7 @@ func TestGoType(t *testing.T) {
 				empties:      1,
 				strings:      1,
 			},
-			expectedGoType: "string",
+			expectedGoTypeStr: "string",
 		},
 		{
 			name: "string_nonempty",
@@ -503,7 +503,7 @@ func TestGoType(t *testing.T) {
 				observations: 1,
 				strings:      1,
 			},
-			expectedGoType: "string",
+			expectedGoTypeStr: "string",
 		},
 		{
 			name: "string_and_null",
@@ -517,7 +517,7 @@ func TestGoType(t *testing.T) {
 				strings:      1,
 				nulls:        1,
 			},
-			expectedGoType: "*string",
+			expectedGoTypeStr: "*string",
 		},
 		{
 			name: "time",
@@ -529,7 +529,7 @@ func TestGoType(t *testing.T) {
 				strings:      1,
 				times:        1,
 			},
-			expectedGoType: "time.Time",
+			expectedGoTypeStr: "time.Time",
 			expectedImports: map[string]struct{}{
 				"time": {},
 			},
@@ -546,7 +546,7 @@ func TestGoType(t *testing.T) {
 				strings:      1,
 				times:        1,
 			},
-			expectedGoType: "*time.Time",
+			expectedGoTypeStr: "*time.Time",
 			expectedImports: map[string]struct{}{
 				"time": {},
 			},
@@ -563,7 +563,7 @@ func TestGoType(t *testing.T) {
 				strings:      2,
 				times:        1,
 			},
-			expectedGoType: "string",
+			expectedGoTypeStr: "string",
 		},
 		{
 			name: "time_and_string_and_null",
@@ -579,7 +579,7 @@ func TestGoType(t *testing.T) {
 				strings:      2,
 				times:        1,
 			},
-			expectedGoType: "*string",
+			expectedGoTypeStr: "*string",
 		},
 		{
 			name: "custom_export_name_func",
@@ -607,7 +607,7 @@ func TestGoType(t *testing.T) {
 			generatorOptions: []GeneratorOption{
 				WithExtraAbbreviations("GPS"),
 			},
-			expectedGoType: "struct {\nGPSAltitude int `json:\"gpsAltitude\"`\n}",
+			expectedGoTypeStr: "struct {\nGPSAltitude int `json:\"gpsAltitude\"`\n}",
 		},
 		{
 			name: "omitempty_always",
@@ -635,7 +635,7 @@ func TestGoType(t *testing.T) {
 			generatorOptions: []GeneratorOption{
 				WithOmitEmpty(OmitEmptyAlways),
 			},
-			expectedGoType: "struct {\nKey int `json:\"key,omitempty\"`\n}",
+			expectedGoTypeStr: "struct {\nKey int `json:\"key,omitempty\"`\n}",
 		},
 		{
 			name: "omitempty_never",
@@ -665,7 +665,7 @@ func TestGoType(t *testing.T) {
 			generatorOptions: []GeneratorOption{
 				WithOmitEmpty(OmitEmptyNever),
 			},
-			expectedGoType: "struct {\nKey int `json:\"key\"`\n}",
+			expectedGoTypeStr: "struct {\nKey int `json:\"key\"`\n}",
 		},
 		{
 			name: "omitempty_auto",
@@ -702,7 +702,7 @@ func TestGoType(t *testing.T) {
 			generatorOptions: []GeneratorOption{
 				WithOmitEmpty(OmitEmptyAuto),
 			},
-			expectedGoType: "struct {\nKey1 int `json:\"key1\"`\nKey2 int `json:\"key2\"`\n}",
+			expectedGoTypeStr: "struct {\nKey1 int `json:\"key1\"`\nKey2 int `json:\"key2\"`\n}",
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -720,8 +720,8 @@ func TestGoType(t *testing.T) {
 				structTagNames:           generator.structTagNames,
 				useJSONNumber:            generator.useJSONNumber,
 			}
-			goType, _ := generator.value.goType(len(tc.values), options)
-			assert.Equal(t, tc.expectedGoType, goType)
+			goType := generator.value.goType(len(tc.values), options)
+			assert.Equal(t, tc.expectedGoTypeStr, goType.typeStr)
 			if len(tc.expectedImports) == 0 {
 				assert.Equal(t, 0, len(options.imports))
 			} else {

@@ -216,7 +216,7 @@ func (g *Generator) Generate() ([]byte, error) {
 	}
 	fmt.Fprintf(buffer, "package %s\n", g.packageName)
 	imports := maps.Clone(g.imports)
-	goType, _ := g.value.goType(0, &generateOptions{
+	goType := g.value.goType(0, &generateOptions{
 		exportNameFunc:           g.exportNameFunc,
 		imports:                  imports,
 		intType:                  g.intType,
@@ -236,7 +236,7 @@ func (g *Generator) Generate() ([]byte, error) {
 	if g.typeComment != "" {
 		fmt.Fprintf(buffer, "// %s\n", g.typeComment)
 	}
-	fmt.Fprintf(buffer, "type %s %s\n", g.typeName, goType)
+	fmt.Fprintf(buffer, "type %s %s\n", g.typeName, goType.typeStr)
 	if !g.goFormat {
 		return buffer.Bytes(), nil
 	}
