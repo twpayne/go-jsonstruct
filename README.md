@@ -174,6 +174,7 @@ To learn about more about the available options, run:
   input, making it suitable for incorporation into build pipelines or detecting
   schema changes.
 * Generates `omitempty` when possible.
+* Generates `,string` tags.
 * Uses the standard library's `time.Time` when possible.
 * Gracefully handles properties with spaces that [cannot be unmarshalled by
   `encoding/json`](https://github.com/golang/go/issues/18531).

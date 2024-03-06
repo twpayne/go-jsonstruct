@@ -367,6 +367,205 @@ func TestGoType(t *testing.T) {
 			expectedGoTypeStr: "struct {\nKey int64 `json:\"key\"`\n}",
 		},
 		{
+			name: "bool_strings",
+			values: []any{
+				map[string]any{
+					"key": "true",
+				},
+				map[string]any{
+					"key": "false",
+				},
+			},
+			expectedValue: &value{
+				observations: 2,
+				objects:      2,
+				objectProperties: map[string]*value{
+					"key": {
+						observations: 2,
+						boolStrings:  2,
+						strings:      2,
+					},
+				},
+				allObjectProperties: &value{
+					observations: 2,
+					boolStrings:  2,
+					strings:      2,
+				},
+			},
+			generatorOptions: []GeneratorOption{
+				WithStringTags(true),
+			},
+			expectedGoTypeStr: "struct {\nKey bool `json:\"key,string\"`\n}",
+		},
+		{
+			name: "bool_strings_with_empty",
+			values: []any{
+				map[string]any{
+					"key": "true",
+				},
+				map[string]any{
+					"key": "false",
+				},
+				map[string]any{
+					"key": "",
+				},
+			},
+			expectedValue: &value{
+				observations: 3,
+				objects:      3,
+				objectProperties: map[string]*value{
+					"key": {
+						observations: 3,
+						empties:      1,
+						boolStrings:  2,
+						strings:      3,
+					},
+				},
+				allObjectProperties: &value{
+					observations: 3,
+					empties:      1,
+					boolStrings:  2,
+					strings:      3,
+				},
+			},
+			generatorOptions: []GeneratorOption{
+				WithOmitEmpty(OmitEmptyAlways),
+				WithStringTags(true),
+			},
+			expectedGoTypeStr: "struct {\nKey string `json:\"key,omitempty\"`\n}",
+		},
+		{
+			name: "bool_strings_with_missing",
+			values: []any{
+				map[string]any{
+					"key": "true",
+				},
+				map[string]any{
+					"key": "false",
+				},
+				map[string]any{},
+			},
+			expectedValue: &value{
+				observations: 3,
+				empties:      1,
+				objects:      3,
+				objectProperties: map[string]*value{
+					"key": {
+						observations: 2,
+						boolStrings:  2,
+						strings:      2,
+					},
+				},
+				allObjectProperties: &value{
+					observations: 2,
+					boolStrings:  2,
+					strings:      2,
+				},
+			},
+			generatorOptions: []GeneratorOption{
+				WithOmitEmpty(OmitEmptyAlways),
+				WithStringTags(true),
+			},
+			expectedGoTypeStr: "struct {\nKey bool `json:\"key,omitempty,string\"`\n}",
+		},
+		{
+			name: "int_strings",
+			values: []any{
+				map[string]any{
+					"key": "1",
+				},
+				map[string]any{
+					"key": "2",
+				},
+			},
+			expectedValue: &value{
+				observations: 2,
+				objects:      2,
+				objectProperties: map[string]*value{
+					"key": {
+						observations:   2,
+						float64Strings: 2,
+						intStrings:     2,
+						strings:        2,
+					},
+				},
+				allObjectProperties: &value{
+					observations:   2,
+					float64Strings: 2,
+					intStrings:     2,
+					strings:        2,
+				},
+			},
+			generatorOptions: []GeneratorOption{
+				WithStringTags(true),
+			},
+			expectedGoTypeStr: "struct {\nKey int `json:\"key,string\"`\n}",
+		},
+		{
+			name: "float64_strings",
+			values: []any{
+				map[string]any{
+					"key": "1.1",
+				},
+				map[string]any{
+					"key": "2.2",
+				},
+			},
+			expectedValue: &value{
+				observations: 2,
+				objects:      2,
+				objectProperties: map[string]*value{
+					"key": {
+						observations:   2,
+						float64Strings: 2,
+						strings:        2,
+					},
+				},
+				allObjectProperties: &value{
+					observations:   2,
+					float64Strings: 2,
+					strings:        2,
+				},
+			},
+			generatorOptions: []GeneratorOption{
+				WithStringTags(true),
+			},
+			expectedGoTypeStr: "struct {\nKey float64 `json:\"key,string\"`\n}",
+		},
+		{
+			name: "int_and_float64_strings",
+			values: []any{
+				map[string]any{
+					"key": "1",
+				},
+				map[string]any{
+					"key": "2.2",
+				},
+			},
+			expectedValue: &value{
+				observations: 2,
+				objects:      2,
+				objectProperties: map[string]*value{
+					"key": {
+						observations:   2,
+						float64Strings: 2,
+						intStrings:     1,
+						strings:        2,
+					},
+				},
+				allObjectProperties: &value{
+					observations:   2,
+					float64Strings: 2,
+					intStrings:     1,
+					strings:        2,
+				},
+			},
+			generatorOptions: []GeneratorOption{
+				WithStringTags(true),
+			},
+			expectedGoTypeStr: "struct {\nKey float64 `json:\"key,string\"`\n}",
+		},
+		{
 			name: "object_unparsable_properties_skip",
 			values: []any{
 				map[string]any{
@@ -717,6 +916,7 @@ func TestGoType(t *testing.T) {
 				intType:                  generator.intType,
 				omitEmptyOption:          generator.omitEmptyOption,
 				skipUnparsableProperties: generator.skipUnparsableProperties,
+				stringTags:               generator.stringTags,
 				structTagNames:           generator.structTagNames,
 				useJSONNumber:            generator.useJSONNumber,
 			}

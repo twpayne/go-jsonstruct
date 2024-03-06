@@ -16,8 +16,11 @@ type value struct {
 	empties             int
 	arrays              int
 	bools               int
+	boolStrings         int
 	float64s            int
+	float64Strings      int
 	ints                int
+	intStrings          int
 	nulls               int
 	objects             int
 	strings             int
@@ -33,6 +36,7 @@ type generateOptions struct {
 	intType                  string
 	omitEmptyOption          OmitEmptyOption
 	skipUnparsableProperties bool
+	stringTags               bool
 	structTagNames           []string
 	useJSONNumber            bool
 }
@@ -40,6 +44,7 @@ type generateOptions struct {
 type goType struct {
 	typeStr   string
 	omitEmpty bool
+	stringTag bool
 }
 
 // observe merges a into v.
@@ -92,6 +97,14 @@ func (v *value) observe(a any) *value {
 	case string:
 		if a == "" {
 			v.empties++
+		}
+		if err := json.Unmarshal([]byte(a), new(bool)); err == nil {
+			v.boolStrings++
+		} else if err := json.Unmarshal([]byte(a), new(int)); err == nil {
+			v.float64Strings++
+			v.intStrings++
+		} else if err := json.Unmarshal([]byte(a), new(float64)); err == nil {
+			v.float64Strings++
 		}
 		if v.times == v.strings {
 			if _, err := time.Parse(time.RFC3339Nano, a); err == nil {
@@ -258,6 +271,9 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 			if omitEmpty {
 				structTagOptions = append(structTagOptions, "omitempty")
 			}
+			if goType.stringTag {
+				structTagOptions = append(structTagOptions, "string")
+			}
 			for _, structTagName := range options.structTagNames {
 				tag := &structtag.Tag{
 					Key:     structTagName,
@@ -300,9 +316,30 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 			omitEmpty: v.times < observations,
 		}
 	case distinctTypes == 1 && v.strings > 0:
-		return goType{
-			typeStr:   "string",
-			omitEmpty: v.strings < observations && v.empties == 0,
+		switch {
+		case options.stringTags && v.strings == v.boolStrings:
+			return goType{
+				typeStr:   "bool",
+				stringTag: true,
+				omitEmpty: v.boolStrings < v.observations,
+			}
+		case options.stringTags && v.strings == v.intStrings:
+			return goType{
+				typeStr:   options.intType,
+				stringTag: true,
+				omitEmpty: v.intStrings < v.strings,
+			}
+		case options.stringTags && v.strings == v.float64Strings:
+			return goType{
+				typeStr:   "float64",
+				stringTag: true,
+				omitEmpty: v.float64Strings < v.strings,
+			}
+		default:
+			return goType{
+				typeStr:   "string",
+				omitEmpty: v.strings < observations && v.empties == 0,
+			}
 		}
 	case distinctTypes == 2 && v.strings > 0 && v.nulls > 0 && v.times == v.strings:
 		options.imports["time"] = struct{}{}

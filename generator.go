@@ -39,6 +39,7 @@ type Generator struct {
 	packageComment           string
 	packageName              string
 	skipUnparsableProperties bool
+	stringTags               bool
 	structTagNames           []string
 	typeComment              string
 	typeName                 string
@@ -124,6 +125,13 @@ func WithRenames(renames map[string]string) GeneratorOption {
 func WithSkipUnparsableProperties(skipUnparsableProperties bool) GeneratorOption {
 	return func(g *Generator) {
 		g.skipUnparsableProperties = skipUnparsableProperties
+	}
+}
+
+// WithStringTags sets whether ",string" tags should be used.
+func WithStringTags(stringTags bool) GeneratorOption {
+	return func(g *Generator) {
+		g.stringTags = stringTags
 	}
 }
 
@@ -222,6 +230,7 @@ func (g *Generator) Generate() ([]byte, error) {
 		intType:                  g.intType,
 		omitEmptyOption:          g.omitEmptyOption,
 		skipUnparsableProperties: g.skipUnparsableProperties,
+		stringTags:               g.stringTags,
 		structTagNames:           g.structTagNames,
 		useJSONNumber:            g.useJSONNumber,
 	})
