@@ -20,6 +20,7 @@ var (
 	packageComment           = pflag.String("package-comment", "", "package comment")
 	packageName              = pflag.String("package-name", "main", "package name")
 	skipUnparsableProperties = pflag.Bool("skip-unparsable-properties", true, "skip unparsable properties")
+	stringTags               = pflag.Bool("string-tags", false, "generate ,string tags")
 	structTagName            = pflag.String("struct-tag-name", "", "struct tag name")
 	typeComment              = pflag.String("type-comment", "", "type comment")
 	typeName                 = pflag.String("typename", "T", "type name")
@@ -41,6 +42,7 @@ func run() error {
 	options := []jsonstruct.GeneratorOption{
 		jsonstruct.WithOmitEmpty(omitEmptyOption[*omitempty]),
 		jsonstruct.WithSkipUnparsableProperties(*skipUnparsableProperties),
+		jsonstruct.WithStringTags(*stringTags),
 		jsonstruct.WithUseJSONNumber(*useJSONNumber),
 		jsonstruct.WithGoFormat(*goFormat),
 	}

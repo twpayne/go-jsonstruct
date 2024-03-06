@@ -39,6 +39,7 @@ type Generator struct {
 	packageComment           string
 	packageName              string
 	skipUnparsableProperties bool
+	stringTags               bool
 	structTagNames           []string
 	typeComment              string
 	typeName                 string
@@ -124,6 +125,13 @@ func WithRenames(renames map[string]string) GeneratorOption {
 func WithSkipUnparsableProperties(skipUnparsableProperties bool) GeneratorOption {
 	return func(g *Generator) {
 		g.skipUnparsableProperties = skipUnparsableProperties
+	}
+}
+
+// WithStringTags sets whether ",string" tags should be used.
+func WithStringTags(stringTags bool) GeneratorOption {
+	return func(g *Generator) {
+		g.stringTags = stringTags
 	}
 }
 
@@ -216,12 +224,13 @@ func (g *Generator) Generate() ([]byte, error) {
 	}
 	fmt.Fprintf(buffer, "package %s\n", g.packageName)
 	imports := maps.Clone(g.imports)
-	goType, _ := g.value.goType(0, &generateOptions{
+	goType := g.value.goType(0, &generateOptions{
 		exportNameFunc:           g.exportNameFunc,
 		imports:                  imports,
 		intType:                  g.intType,
 		omitEmptyOption:          g.omitEmptyOption,
 		skipUnparsableProperties: g.skipUnparsableProperties,
+		stringTags:               g.stringTags,
 		structTagNames:           g.structTagNames,
 		useJSONNumber:            g.useJSONNumber,
 	})
@@ -236,7 +245,7 @@ func (g *Generator) Generate() ([]byte, error) {
 	if g.typeComment != "" {
 		fmt.Fprintf(buffer, "// %s\n", g.typeComment)
 	}
-	fmt.Fprintf(buffer, "type %s %s\n", g.typeName, goType)
+	fmt.Fprintf(buffer, "type %s %s\n", g.typeName, goType.typeStr)
 	if !g.goFormat {
 		return buffer.Bytes(), nil
 	}
