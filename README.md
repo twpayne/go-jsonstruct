@@ -2,21 +2,23 @@
 
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/twpayne/go-jsonstruct/v3)](https://pkg.go.dev/github.com/twpayne/go-jsonstruct/v3)
 
-Generate Go structs from multiple JSON objects.
+Generate Go structs from multiple JSON or YAML objects.
 
 * [What does go-jsonstruct do and why should I use it?](#what-does-go-jsonstruct-do-and-why-should-i-use-it)
 * [How do I use go-jsonstruct?](#how-do-i-use-go-jsonstruct)
+* [YAML support](#yaml-support)
 * [What are go-jsonstruct's key features?](#what-are-go-jsonstructs-key-features)
 * [How does go-jsonstruct work?](#how-does-go-jsonstruct-work)
 * [License](#license)
 
 ## What does go-jsonstruct do and why should I use it?
 
-go-jsonstruct generates Go structs from *multiple* JSON objects. Existing Go
-struct generators such as [json-to-go](https://mholt.github.io/json-to-go/) and
+go-jsonstruct generates Go structs from *multiple* JSON or YAML objects.
+Existing Go struct generators such as
+[json-to-go](https://mholt.github.io/json-to-go/) and
 [json2struct](http://json2struct.mervine.net/) take only a *single* JSON object
-as input. go-jsonstruct takes multiple JSON objects as input and generates the
-most specific Go struct possible into which all the input objects can be
+as input. go-jsonstruct takes multiple objects as input and generates the most
+specific Go struct possible into which all the input objects can be
 unmarshalled.
 
 This is useful if you have a collection of JSON objects, where no single object
@@ -26,6 +28,7 @@ Go program. Example collections include:
 * JSON responses received from a REST API with no defined schema.
 * Multiple values from a JSON column in an SQL database.
 * All the JSON documents in a document database.
+* All the YAML configuration files in a directory.
 
 ## How do I use go-jsonstruct?
 
@@ -160,11 +163,23 @@ To learn about more about the available options, run:
 
     gojsonstruct --help
 
+## YAML support
+
+For YAML files, pass the `--format=yaml` flag, for example:
+
+```console
+$ gojsonstruct --format=yaml *.yaml
+```
+
+gojsonstruct will analyze all passed YAML files and generate a Go struct with
+`yaml:"..."` struct tags.
+
 ## What are go-jsonstruct's key features?
 
 * Finds the most specific Go type that can represent all input values.
+* Handles JSON and YAML.
 * Generates Go struct field names from  `camelCase`, `kebab-case`, and
-  `snake_case` JSON object property names.
+  `snake_case` object property names.
 * Capitalizes common abbreviations (e.g. HTTP, ID, and URL) when
   generating Go struct field names to follow Go conventions, with the option to
   add your own abbreviations.
