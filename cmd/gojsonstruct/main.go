@@ -16,6 +16,7 @@ var (
 	abbreviations            = pflag.String("abbreviations", "", "comma-separated list of extra abbreviations")
 	format                   = pflag.String("format", "json", "format (json or yaml)")
 	decompress               = pflag.Bool("z", false, "decompress input with gzip")
+	fileHeader               = pflag.String("file-header", "", "file header")
 	omitEmptyTags            = pflag.String("omitempty-tags", "auto", "generate ,omitempty tags (never, always, or auto)")
 	packageComment           = pflag.String("package-comment", "", "package comment")
 	packageName              = pflag.String("package-name", "main", "package name")
@@ -40,6 +41,7 @@ func run() error {
 	pflag.Parse()
 
 	options := []jsonstruct.GeneratorOption{
+		jsonstruct.WithFileHeader(*fileHeader),
 		jsonstruct.WithOmitEmptyTags(omitEmptyTagsType[*omitEmptyTags]),
 		jsonstruct.WithSkipUnparsableProperties(*skipUnparsableProperties),
 		jsonstruct.WithStringTags(*stringTags),

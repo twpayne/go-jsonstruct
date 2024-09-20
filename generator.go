@@ -32,6 +32,7 @@ type Generator struct {
 	abbreviations            map[string]bool
 	exportNameFunc           ExportNameFunc
 	exportRenames            map[string]string
+	fileHeader               string
 	goFormat                 bool
 	imports                  map[string]struct{}
 	intType                  string
@@ -73,6 +74,13 @@ func WithExtraAbbreviations(abbreviations ...string) GeneratorOption {
 		for _, abbreviation := range abbreviations {
 			g.abbreviations[abbreviation] = true
 		}
+	}
+}
+
+// WithFileHeader sets the file header.
+func WithFileHeader(fileHeader string) GeneratorOption {
+	return func(g *Generator) {
+		g.fileHeader = fileHeader
 	}
 }
 
@@ -219,6 +227,9 @@ func NewGenerator(options ...GeneratorOption) *Generator {
 func (g *Generator) Generate() ([]byte, error) {
 	buffer := &bytes.Buffer{}
 	buffer.Grow(65536)
+	if g.fileHeader != "" {
+		fmt.Fprintf(buffer, "%s\n\n", g.fileHeader)
+	}
 	if g.packageComment != "" {
 		fmt.Fprintf(buffer, "// %s\n", g.packageComment)
 	}
