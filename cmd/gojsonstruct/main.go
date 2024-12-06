@@ -49,7 +49,8 @@ func run() error {
 		jsonstruct.WithGoFormat(*goFormat),
 	}
 	if *abbreviations != "" {
-		options = append(options, jsonstruct.WithExtraAbbreviations(strings.Split(*abbreviations, ",")...))
+		extraAbbreviations := strings.Split(strings.ToUpper(*abbreviations), ",")
+		options = append(options, jsonstruct.WithExtraAbbreviations(extraAbbreviations...))
 	}
 	if *intType != "" {
 		options = append(options, jsonstruct.WithIntType(*intType))
