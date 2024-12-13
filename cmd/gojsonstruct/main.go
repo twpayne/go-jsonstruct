@@ -15,7 +15,7 @@ import (
 var (
 	abbreviations            = pflag.String("abbreviations", "", "comma-separated list of extra abbreviations")
 	format                   = pflag.String("format", "json", "format (json or yaml)")
-	decompress               = pflag.Bool("z", false, "decompress input with gzip")
+	decompress               = pflag.BoolP("gzip", "z", false, "decompress input with gzip")
 	fileHeader               = pflag.String("file-header", "", "file header")
 	omitEmptyTags            = pflag.String("omitempty-tags", "auto", "generate ,omitempty tags (never, always, or auto)")
 	packageComment           = pflag.String("package-comment", "", "package comment")
@@ -28,7 +28,7 @@ var (
 	intType                  = pflag.String("int-type", "", "integer type")
 	useJSONNumber            = pflag.Bool("use-json-number", false, "use json.Number")
 	goFormat                 = pflag.Bool("go-format", true, "format generated Go code")
-	output                   = pflag.String("o", "", "output filename")
+	output                   = pflag.StringP("output", "o", "", "output filename")
 
 	omitEmptyTagsType = map[string]jsonstruct.OmitEmptyTagsType{
 		"never":  jsonstruct.OmitEmptyTagsNever,
