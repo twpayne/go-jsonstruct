@@ -103,13 +103,13 @@ func run() error {
 		case "json":
 			for _, arg := range pflag.Args() {
 				if err := generator.ObserveJSONFile(arg); err != nil {
-					return err
+					return fmt.Errorf("%s: %w", arg, err)
 				}
 			}
 		case "yaml":
 			for _, arg := range pflag.Args() {
 				if err := generator.ObserveYAMLFile(arg); err != nil {
-					return err
+					return fmt.Errorf("%s: %w", arg, err)
 				}
 			}
 		default:
