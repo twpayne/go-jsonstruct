@@ -18,8 +18,8 @@ jobs:
         - oldstable
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
-    - uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+    - uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34
       with:
         go-version: ${{ matrix.go-version }}
     - name: build
@@ -29,7 +29,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
-    - uses: golangci/golangci-lint-action@aaa42aa0628b4ae2578232a66b541047968fac86
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+    - uses: golangci/golangci-lint-action@2226d7cb06a077cd73e56eedd38eecad18e5d837
       with:
         version: v1.61.0
