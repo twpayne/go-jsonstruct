@@ -4,12 +4,13 @@
 
 Generate Go structs from multiple JSON or YAML objects.
 
-* [What does go-jsonstruct do and why should I use it?](#what-does-go-jsonstruct-do-and-why-should-i-use-it)
-* [How do I use go-jsonstruct?](#how-do-i-use-go-jsonstruct)
-* [YAML support](#yaml-support)
-* [What are go-jsonstruct's key features?](#what-are-go-jsonstructs-key-features)
-* [How does go-jsonstruct work?](#how-does-go-jsonstruct-work)
-* [License](#license)
+- [go-jsonstruct](#go-jsonstruct)
+  - [What does go-jsonstruct do and why should I use it?](#what-does-go-jsonstruct-do-and-why-should-i-use-it)
+  - [How do I use go-jsonstruct?](#how-do-i-use-go-jsonstruct)
+  - [YAML support](#yaml-support)
+  - [What are go-jsonstruct's key features?](#what-are-go-jsonstructs-key-features)
+  - [How does go-jsonstruct work?](#how-does-go-jsonstruct-work)
+  - [License](#license)
 
 ## What does go-jsonstruct do and why should I use it?
 
@@ -189,6 +190,7 @@ gojsonstruct will analyze all passed YAML files and generate a Go struct with
   input, making it suitable for incorporation into build pipelines or detecting
   schema changes.
 * Generates `,omitempty` tags.
+* Generates `,omitzero` tags.
 * Generates `,string` tags.
 * Uses the standard library's `time.Time` when possible.
 * Gracefully handles properties with spaces that [cannot be unmarshalled by

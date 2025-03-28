@@ -14,6 +14,7 @@ import (
 type value struct {
 	observations        int
 	empties             int
+	zeros               int
 	arrays              int
 	bools               int
 	boolStrings         int
@@ -35,6 +36,7 @@ type generateOptions struct {
 	imports                  map[string]struct{}
 	intType                  string
 	omitEmptyTags            OmitEmptyTagsType
+	omitZeroTags             OmitZeroTagsType
 	skipUnparsableProperties bool
 	stringTags               bool
 	structTagNames           []string
@@ -44,6 +46,7 @@ type generateOptions struct {
 type goType struct {
 	typeStr   string
 	omitEmpty bool
+	omitZero  bool
 	stringTag bool
 }
 
@@ -69,19 +72,23 @@ func (v *value) observe(a any) *value {
 		v.bools++
 		if !a {
 			v.empties++
+			v.zeros++
 		}
 	case float64:
 		v.float64s++
 		if a == 0 {
 			v.empties++
+			v.zeros++
 		}
 	case int:
 		v.ints++
 		if a == 0 {
 			v.empties++
+			v.zeros++
 		}
 	case nil:
 		v.nulls++
+		v.zeros++
 	case map[string]any:
 		v.objects++
 		if len(a) == 0 {
@@ -97,6 +104,7 @@ func (v *value) observe(a any) *value {
 	case string:
 		if a == "" {
 			v.empties++
+			v.zeros++
 		}
 		if err := json.Unmarshal([]byte(a), new(bool)); err == nil {
 			v.boolStrings++
@@ -107,16 +115,25 @@ func (v *value) observe(a any) *value {
 			v.float64Strings++
 		}
 		if v.times == v.strings {
-			if _, err := time.Parse(time.RFC3339Nano, a); err == nil {
+			if t, err := time.Parse(time.RFC3339Nano, a); err == nil {
 				v.times++
+				if t.IsZero() {
+					v.zeros++
+				}
 			}
 		}
 		v.strings++
 	case json.Number:
-		if _, err := a.Int64(); err == nil {
+		if i, err := a.Int64(); err == nil {
 			v.ints++
+			if i == 0 {
+				v.zeros++
+			}
 		} else {
 			v.float64s++
+			if f, err := a.Float64(); err == nil && f == 0 {
+				v.zeros++
+			}
 		}
 	}
 	return v
@@ -162,6 +179,7 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 		return goType{
 			typeStr:   "bool",
 			omitEmpty: v.bools < observations && v.empties == 0,
+			omitZero:  v.zeros == 0,
 		}
 	case distinctTypes == 2 && v.bools > 0 && v.nulls > 0:
 		return goType{
@@ -171,6 +189,7 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 		return goType{
 			typeStr:   "float64",
 			omitEmpty: v.float64s < observations && v.empties == 0,
+			omitZero:  v.zeros == 0,
 		}
 	case distinctTypes == 2 && v.float64s > 0 && v.nulls > 0:
 		return goType{
@@ -180,6 +199,7 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 		return goType{
 			typeStr:   options.intType,
 			omitEmpty: v.ints < observations && v.empties == 0,
+			omitZero:  v.zeros == 0,
 		}
 	case distinctTypes == 2 && v.ints > 0 && v.nulls > 0:
 		return goType{
@@ -192,21 +212,25 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 			return goType{
 				typeStr:   "json.Number",
 				omitEmpty: omitEmpty,
+				omitZero:  v.zeros == 0,
 			}
 		}
 		return goType{
 			typeStr:   "float64",
 			omitEmpty: omitEmpty,
+			omitZero:  v.zeros == 0,
 		}
 	case distinctTypes == 3 && v.float64s > 0 && v.ints > 0 && v.nulls > 0:
 		if options.useJSONNumber {
 			options.imports["encoding/json"] = struct{}{}
 			return goType{
-				typeStr: "*json.Number",
+				typeStr:  "*json.Number",
+				omitZero: v.zeros == 0,
 			}
 		}
 		return goType{
-			typeStr: "*float64",
+			typeStr:  "*float64",
+			omitZero: v.zeros == 0,
 		}
 	case distinctTypes == 1 && v.objects > 0:
 		fallthrough
@@ -265,11 +289,23 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 			case options.omitEmptyTags == OmitEmptyTagsAuto:
 				omitEmpty = goType.omitEmpty
 			}
+			var omitZero bool
+			switch options.omitZeroTags {
+			case OmitZeroTagsNever:
+				omitZero = false
+			case OmitZeroTagsAlways:
+				omitZero = true
+			case OmitZeroTagsAuto:
+				omitZero = goType.omitZero
+			}
 
 			tags, _ := structtag.Parse("")
 			var structTagOptions []string
 			if omitEmpty {
 				structTagOptions = append(structTagOptions, "omitempty")
+			}
+			if omitZero {
+				structTagOptions = append(structTagOptions, "omitzero")
 			}
 			if goType.stringTag {
 				structTagOptions = append(structTagOptions, "string")
@@ -302,11 +338,13 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 			return goType{
 				typeStr:   "*" + b.String(),
 				omitEmpty: true,
+				omitZero:  v.zeros == 0,
 			}
 		default:
 			return goType{
 				typeStr:   "*" + b.String(),
 				omitEmpty: v.objects+v.nulls < observations,
+				omitZero:  v.zeros == 0,
 			}
 		}
 	case distinctTypes == 1 && v.strings > 0 && v.times == v.strings:
@@ -314,6 +352,7 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 		return goType{
 			typeStr:   "time.Time",
 			omitEmpty: v.times < observations,
+			omitZero:  v.zeros == 0,
 		}
 	case distinctTypes == 1 && v.strings > 0:
 		switch {
@@ -322,23 +361,27 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 				typeStr:   "bool",
 				stringTag: true,
 				omitEmpty: v.boolStrings < v.observations,
+				omitZero:  v.zeros == 0,
 			}
 		case options.stringTags && v.strings == v.intStrings:
 			return goType{
 				typeStr:   options.intType,
 				stringTag: true,
 				omitEmpty: v.intStrings < v.strings,
+				omitZero:  v.zeros == 0,
 			}
 		case options.stringTags && v.strings == v.float64Strings:
 			return goType{
 				typeStr:   "float64",
 				stringTag: true,
 				omitEmpty: v.float64Strings < v.strings,
+				omitZero:  v.zeros == 0,
 			}
 		default:
 			return goType{
 				typeStr:   "string",
 				omitEmpty: v.strings < observations && v.empties == 0,
+				omitZero:  v.zeros == 0,
 			}
 		}
 	case distinctTypes == 2 && v.strings > 0 && v.nulls > 0 && v.times == v.strings:
