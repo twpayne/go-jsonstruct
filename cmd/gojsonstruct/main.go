@@ -19,6 +19,7 @@ var (
 	fileHeader               = pflag.String("file-header", "", "file header")
 	ignoreErrors             = pflag.Bool("ignore-errors", false, "ignore errors")
 	omitEmptyTags            = pflag.String("omitempty-tags", "auto", "generate ,omitempty tags (never, always, or auto)")
+	omitZeroTags             = pflag.String("omitzero-tags", "auto", "generate ,omitzero tags (never, always, or auto)")
 	packageComment           = pflag.String("package-comment", "", "package comment")
 	packageName              = pflag.String("package-name", "main", "package name")
 	skipUnparsableProperties = pflag.Bool("skip-unparsable-properties", true, "skip unparsable properties")
@@ -36,6 +37,11 @@ var (
 		"always": jsonstruct.OmitEmptyTagsAlways,
 		"auto":   jsonstruct.OmitEmptyTagsAuto,
 	}
+	omitZeroTagsType = map[string]jsonstruct.OmitZeroTagsType{
+		"never":  jsonstruct.OmitZeroTagsNever,
+		"always": jsonstruct.OmitZeroTagsAlways,
+		"auto":   jsonstruct.OmitZeroTagsAuto,
+	}
 )
 
 func run() error {
@@ -44,6 +50,7 @@ func run() error {
 	options := []jsonstruct.GeneratorOption{
 		jsonstruct.WithFileHeader(*fileHeader),
 		jsonstruct.WithOmitEmptyTags(omitEmptyTagsType[*omitEmptyTags]),
+		jsonstruct.WithOmitZeroTags(omitZeroTagsType[*omitZeroTags]),
 		jsonstruct.WithSkipUnparsableProperties(*skipUnparsableProperties),
 		jsonstruct.WithStringTags(*stringTags),
 		jsonstruct.WithUseJSONNumber(*useJSONNumber),

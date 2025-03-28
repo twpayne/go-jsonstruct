@@ -46,6 +46,7 @@ func TestGoType(t *testing.T) {
 				arrayElements: &value{
 					observations: 1,
 					empties:      1,
+					zeros:        1,
 					bools:        1,
 				},
 			},
@@ -59,6 +60,7 @@ func TestGoType(t *testing.T) {
 			expectedValue: &value{
 				observations: 1,
 				empties:      1,
+				zeros:        1,
 				bools:        1,
 			},
 			expectedGoTypeStr: "bool",
@@ -82,6 +84,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 2,
+				zeros:        2,
 				empties:      1,
 				bools:        1,
 				nulls:        1,
@@ -96,6 +99,7 @@ func TestGoType(t *testing.T) {
 			expectedValue: &value{
 				observations: 1,
 				empties:      1,
+				zeros:        1,
 				float64s:     1,
 			},
 			expectedGoTypeStr: "float64",
@@ -120,6 +124,7 @@ func TestGoType(t *testing.T) {
 			expectedValue: &value{
 				observations: 2,
 				empties:      1,
+				zeros:        2,
 				float64s:     1,
 				nulls:        1,
 			},
@@ -133,6 +138,7 @@ func TestGoType(t *testing.T) {
 			expectedValue: &value{
 				observations: 1,
 				empties:      1,
+				zeros:        1,
 				ints:         1,
 			},
 			expectedGoTypeStr: "int",
@@ -157,6 +163,7 @@ func TestGoType(t *testing.T) {
 			expectedValue: &value{
 				observations: 2,
 				empties:      1,
+				zeros:        2,
 				ints:         1,
 				nulls:        1,
 			},
@@ -170,6 +177,7 @@ func TestGoType(t *testing.T) {
 			expectedValue: &value{
 				observations: 1,
 				empties:      1,
+				zeros:        1,
 				ints:         1,
 			},
 			generatorOptions: []GeneratorOption{
@@ -185,6 +193,7 @@ func TestGoType(t *testing.T) {
 			expectedValue: &value{
 				observations: 1,
 				empties:      1,
+				zeros:        1,
 				ints:         1,
 			},
 			generatorOptions: []GeneratorOption{
@@ -201,6 +210,7 @@ func TestGoType(t *testing.T) {
 			expectedValue: &value{
 				observations: 2,
 				empties:      2,
+				zeros:        2,
 				float64s:     1,
 				ints:         1,
 			},
@@ -215,6 +225,7 @@ func TestGoType(t *testing.T) {
 			expectedValue: &value{
 				observations: 2,
 				empties:      2,
+				zeros:        2,
 				float64s:     1,
 				ints:         1,
 			},
@@ -236,6 +247,7 @@ func TestGoType(t *testing.T) {
 			expectedValue: &value{
 				observations: 3,
 				empties:      2,
+				zeros:        3,
 				float64s:     1,
 				ints:         1,
 				nulls:        1,
@@ -252,6 +264,7 @@ func TestGoType(t *testing.T) {
 			expectedValue: &value{
 				observations: 3,
 				empties:      2,
+				zeros:        3,
 				float64s:     1,
 				ints:         1,
 				nulls:        1,
@@ -286,6 +299,7 @@ func TestGoType(t *testing.T) {
 			expectedValue: &value{
 				observations:     2,
 				empties:          1,
+				zeros:            1,
 				nulls:            1,
 				objects:          1,
 				objectProperties: map[string]*value{},
@@ -306,12 +320,14 @@ func TestGoType(t *testing.T) {
 					"key": {
 						observations: 1,
 						empties:      1,
+						zeros:        1,
 						bools:        1,
 					},
 				},
 				allObjectProperties: &value{
 					observations: 1,
 					empties:      1,
+					zeros:        1,
 					bools:        1,
 				},
 			},
@@ -417,6 +433,7 @@ func TestGoType(t *testing.T) {
 					"key": {
 						observations: 3,
 						empties:      1,
+						zeros:        1,
 						boolStrings:  2,
 						strings:      3,
 					},
@@ -424,6 +441,7 @@ func TestGoType(t *testing.T) {
 				allObjectProperties: &value{
 					observations: 3,
 					empties:      1,
+					zeros:        1,
 					boolStrings:  2,
 					strings:      3,
 				},
@@ -579,12 +597,14 @@ func TestGoType(t *testing.T) {
 					"key with spaces": {
 						observations: 1,
 						empties:      1,
+						zeros:        1,
 						bools:        1,
 					},
 				},
 				allObjectProperties: &value{
 					observations: 1,
 					empties:      1,
+					zeros:        1,
 					bools:        1,
 				},
 			},
@@ -605,6 +625,7 @@ func TestGoType(t *testing.T) {
 					"key with spaces": {
 						observations: 1,
 						empties:      1,
+						zeros:        1,
 						bools:        1,
 					},
 					"another key with spaces": {
@@ -615,6 +636,7 @@ func TestGoType(t *testing.T) {
 				allObjectProperties: &value{
 					observations: 2,
 					empties:      1,
+					zeros:        1,
 					bools:        2,
 				},
 			},
@@ -638,17 +660,20 @@ func TestGoType(t *testing.T) {
 					"key with spaces": {
 						observations: 1,
 						empties:      1,
+						zeros:        1,
 						bools:        1,
 					},
 					"another key with spaces": {
 						observations: 1,
 						empties:      1,
+						zeros:        1,
 						ints:         1,
 					},
 				},
 				allObjectProperties: &value{
 					observations: 2,
 					empties:      2,
+					zeros:        2,
 					bools:        1,
 					ints:         1,
 				},
@@ -688,6 +713,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 1,
+				zeros:        1,
 				empties:      1,
 				strings:      1,
 			},
@@ -713,6 +739,7 @@ func TestGoType(t *testing.T) {
 			expectedValue: &value{
 				observations: 2,
 				empties:      1,
+				zeros:        2,
 				strings:      1,
 				nulls:        1,
 			},
@@ -744,6 +771,7 @@ func TestGoType(t *testing.T) {
 				nulls:        1,
 				strings:      1,
 				times:        1,
+				zeros:        1,
 			},
 			expectedGoTypeStr: "*time.Time",
 			expectedImports: map[string]struct{}{
@@ -758,6 +786,7 @@ func TestGoType(t *testing.T) {
 			},
 			expectedValue: &value{
 				observations: 2,
+				zeros:        1,
 				empties:      1,
 				strings:      2,
 				times:        1,
@@ -774,6 +803,7 @@ func TestGoType(t *testing.T) {
 			expectedValue: &value{
 				observations: 3,
 				empties:      1,
+				zeros:        2,
 				nulls:        1,
 				strings:      2,
 				times:        1,
@@ -795,12 +825,14 @@ func TestGoType(t *testing.T) {
 						observations: 1,
 						empties:      1,
 						ints:         1,
+						zeros:        1,
 					},
 				},
 				allObjectProperties: &value{
 					observations: 1,
 					empties:      1,
 					ints:         1,
+					zeros:        1,
 				},
 			},
 			generatorOptions: []GeneratorOption{
@@ -823,12 +855,14 @@ func TestGoType(t *testing.T) {
 						observations: 1,
 						empties:      1,
 						ints:         1,
+						zeros:        1,
 					},
 				},
 				allObjectProperties: &value{
 					observations: 1,
 					empties:      1,
 					ints:         1,
+					zeros:        1,
 				},
 			},
 			generatorOptions: []GeneratorOption{
@@ -853,12 +887,14 @@ func TestGoType(t *testing.T) {
 						observations: 1,
 						empties:      1,
 						ints:         1,
+						zeros:        1,
 					},
 				},
 				allObjectProperties: &value{
 					observations: 1,
 					empties:      1,
 					ints:         1,
+					zeros:        1,
 				},
 			},
 			generatorOptions: []GeneratorOption{
@@ -885,17 +921,20 @@ func TestGoType(t *testing.T) {
 						observations: 2,
 						empties:      2,
 						ints:         2,
+						zeros:        2,
 					},
 					"key2": {
 						observations: 1,
 						empties:      1,
 						ints:         1,
+						zeros:        1,
 					},
 				},
 				allObjectProperties: &value{
 					observations: 3,
 					empties:      3,
 					ints:         3,
+					zeros:        3,
 				},
 			},
 			generatorOptions: []GeneratorOption{
@@ -915,6 +954,7 @@ func TestGoType(t *testing.T) {
 				imports:                  make(map[string]struct{}),
 				intType:                  generator.intType,
 				omitEmptyTags:            generator.omitEmptyTags,
+				omitZeroTags:             generator.omitZeroTags,
 				skipUnparsableProperties: generator.skipUnparsableProperties,
 				stringTags:               generator.stringTags,
 				structTagNames:           generator.structTagNames,
@@ -1306,6 +1346,48 @@ func TestObserveJSONGoCode(t *testing.T) {
 				"\n" +
 				"type T struct {\n" +
 				"\tRename bool `json:\"name\"`\n" +
+				"}\n",
+		},
+		{
+			name: "omitzero_auto",
+			json: `{` +
+				`"nonZeroBool":true,"zeroBool":false,` +
+				`"nonZeroInt":1,"zeroInt":0,` +
+				`"nonZeroString":"s","zeroString":"",` +
+				`"nonZeroTime":"2025-01-01T00:00:00Z","zeroTime":"0001-01-01T00:00:00Z"` +
+				`}`,
+			generatorOptions: []GeneratorOption{
+				WithOmitZeroTags(OmitZeroTagsAuto),
+			},
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"import (\n" +
+				"\t\"time\"\n" +
+				")\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\tNonZeroBool   bool      `json:\"nonZeroBool,omitzero\"`\n" +
+				"\tNonZeroInt    int       `json:\"nonZeroInt,omitzero\"`\n" +
+				"\tNonZeroString string    `json:\"nonZeroString,omitzero\"`\n" +
+				"\tNonZeroTime   time.Time `json:\"nonZeroTime,omitzero\"`\n" +
+				"\tZeroBool      bool      `json:\"zeroBool\"`\n" +
+				"\tZeroInt       int       `json:\"zeroInt\"`\n" +
+				"\tZeroString    string    `json:\"zeroString\"`\n" +
+				"\tZeroTime      time.Time `json:\"zeroTime\"`\n" +
+				"}\n",
+		},
+		{
+			name: "omitzero_always",
+			json: `{"zeroBool":false}`,
+			generatorOptions: []GeneratorOption{
+				WithOmitZeroTags(OmitZeroTagsAlways),
+			},
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\tZeroBool bool `json:\"zeroBool,omitzero\"`\n" +
 				"}\n",
 		},
 	} {

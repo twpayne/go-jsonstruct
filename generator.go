@@ -27,6 +27,16 @@ const (
 	OmitEmptyTagsAuto
 )
 
+// An OmitZeroTagsType sets how to handle ,omitzero tags.
+type OmitZeroTagsType int
+
+// OmitZeroTags values.
+const (
+	OmitZeroTagsNever OmitZeroTagsType = iota
+	OmitZeroTagsAlways
+	OmitZeroTagsAuto
+)
+
 // A Generator generates Go types from observed values.
 type Generator struct {
 	abbreviations            map[string]bool
@@ -37,6 +47,7 @@ type Generator struct {
 	imports                  map[string]struct{}
 	intType                  string
 	omitEmptyTags            OmitEmptyTagsType
+	omitZeroTags             OmitZeroTagsType
 	packageComment           string
 	packageName              string
 	skipUnparsableProperties bool
@@ -102,6 +113,13 @@ func WithIntType(intType string) GeneratorOption {
 func WithOmitEmptyTags(omitEmptyTags OmitEmptyTagsType) GeneratorOption {
 	return func(g *Generator) {
 		g.omitEmptyTags = omitEmptyTags
+	}
+}
+
+// WithOmitZeroTags sets whether ",omitzero" tags should be used.
+func WithOmitZeroTags(omitZeroTags OmitZeroTagsType) GeneratorOption {
+	return func(g *Generator) {
+		g.omitZeroTags = omitZeroTags
 	}
 }
 
@@ -204,6 +222,7 @@ func NewGenerator(options ...GeneratorOption) *Generator {
 		imports:                  make(map[string]struct{}),
 		intType:                  "int",
 		omitEmptyTags:            OmitEmptyTagsAuto,
+		omitZeroTags:             OmitZeroTagsNever,
 		packageName:              "main",
 		skipUnparsableProperties: true,
 		structTagNames:           []string{"json"},
@@ -240,6 +259,7 @@ func (g *Generator) Generate() ([]byte, error) {
 		imports:                  imports,
 		intType:                  g.intType,
 		omitEmptyTags:            g.omitEmptyTags,
+		omitZeroTags:             g.omitZeroTags,
 		skipUnparsableProperties: g.skipUnparsableProperties,
 		stringTags:               g.stringTags,
 		structTagNames:           g.structTagNames,
