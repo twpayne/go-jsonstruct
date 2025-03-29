@@ -1,135 +1,146 @@
+version: "2"
 linters:
   enable:
-  - asasalint
-  - asciicheck
-  - bidichk
-  - bodyclose
-  - canonicalheader
-  - containedctx
-  - contextcheck
-  - copyloopvar
-  - decorder
-  - dogsled
-  - dupl
-  - dupword
-  - durationcheck
-  - err113
-  - errcheck
-  - errchkjson
-  - errname
-  - errorlint
-  - exhaustive
-  - exptostd
-  - fatcontext
-  - forcetypeassert
-  - gci
-  - ginkgolinter
-  - gocheckcompilerdirectives
-  - gochecknoinits
-  - gochecksumtype
-  - gocritic
-  - godot
-  - gofmt
-  - gofumpt
-  - goheader
-  - goimports
-  - gomoddirectives
-  - gomodguard
-  - goprintffuncname
-  - gosec
-  - gosimple
-  - gosmopolitan
-  - govet
-  - grouper
-  - iface
-  - importas
-  - inamedparam
-  - ineffassign
-  - interfacebloat
-  - intrange
-  - ireturn
-  - loggercheck
-  - makezero
-  - mirror
-  - misspell
-  - musttag
-  - nakedret
-  - nilerr
-  - nilnesserr
-  - nilnil
-  - noctx
-  - nolintlint
-  - nonamedreturns
-  - nosprintfhostport
-  - perfsprint
-  - prealloc
-  - predeclared
-  - promlinter
-  - protogetter
-  - reassign
-  - recvcheck
-  - revive
-  - rowserrcheck
-  - sloglint
-  - spancheck
-  - sqlclosecheck
-  - staticcheck
-  - stylecheck
-  - tagalign
-  - tagliatelle
-  - testableexamples
-  - testifylint
-  - thelper
-  - tparallel
-  - typecheck
-  - unconvert
-  - unparam
-  - unused
-  - usestdlibvars
-  - usetesting
-  - wastedassign
-  - whitespace
-  - zerologlint
-  disable:
-  - cyclop
-  - depguard
-  - exhaustruct
-  - forbidigo
-  - funlen
-  - gochecknoglobals
-  - gocognit
-  - goconst
-  - gocyclo
-  - godox
-  - lll
-  - maintidx
-  - mnd
-  - nestif
-  - nlreturn
-  - paralleltest
-  - testpackage
-  - varnamelen
-  - wrapcheck
-  - wsl
-
-linters-settings:
-  gci:
-    sections:
-    - standard
-    - default
-    - prefix(github.com/twpayne/go-jsonstruct)
-  gofumpt:
-    extra-rules: true
-    module-path: github.com/twpayne/go-jsonstruct
-  goimports:
-    local-prefixes: github.com/twpayne/go-jsonstruct
-
-issues:
-  exclude-rules:
-  - linters:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - decorder
+    - dogsled
     - dupl
-    - scopelint
-    path: "_test\\.go"
-  - linters:
+    - dupword
+    - durationcheck
     - err113
-    text: do not define dynamic errors, use wrapped static errors instead
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+    - exptostd
+    - fatcontext
+    - forcetypeassert
+    - ginkgolinter
+    - gocheckcompilerdirectives
+    - gochecknoinits
+    - gochecksumtype
+    - gocritic
+    - godot
+    - goheader
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - grouper
+    - iface
+    - importas
+    - inamedparam
+    - interfacebloat
+    - intrange
+    - ireturn
+    - loggercheck
+    - makezero
+    - mirror
+    - misspell
+    - musttag
+    - nakedret
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - noctx
+    - nolintlint
+    - nonamedreturns
+    - nosprintfhostport
+    - perfsprint
+    - prealloc
+    - predeclared
+    - promlinter
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - tagalign
+    - tagliatelle
+    - testableexamples
+    - testifylint
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - usestdlibvars
+    - usetesting
+    - wastedassign
+    - whitespace
+    - zerologlint
+  disable:
+    - cyclop
+    - depguard
+    - exhaustruct
+    - forbidigo
+    - funlen
+    - gochecknoglobals
+    - gocognit
+    - goconst
+    - gocyclo
+    - godox
+    - lll
+    - maintidx
+    - mnd
+    - nestif
+    - nlreturn
+    - paralleltest
+    - testpackage
+    - varnamelen
+    - wrapcheck
+    - wsl
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - dupl
+          - scopelint
+        path: _test\.go
+      - linters:
+          - err113
+        text: do not define dynamic errors, use wrapped static errors instead
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/twpayne/go-jsonstruct)
+    gofumpt:
+      module-path: github.com/twpayne/go-jsonstruct
+      extra-rules: true
+    goimports:
+      local-prefixes:
+        - github.com/twpayne/go-jsonstruct
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

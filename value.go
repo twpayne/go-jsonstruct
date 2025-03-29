@@ -281,12 +281,12 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 			}
 			goType := v.objectProperties[property].goType(v.objects, options)
 			var omitEmpty bool
-			switch {
-			case options.omitEmptyTags == OmitEmptyTagsNever:
+			switch options.omitEmptyTags {
+			case OmitEmptyTagsNever:
 				omitEmpty = false
-			case options.omitEmptyTags == OmitEmptyTagsAlways:
+			case OmitEmptyTagsAlways:
 				omitEmpty = true
-			case options.omitEmptyTags == OmitEmptyTagsAuto:
+			case OmitEmptyTagsAuto:
 				omitEmpty = goType.omitEmpty
 			}
 			var omitZero bool
