@@ -14,6 +14,7 @@ linters:
     - dupl
     - dupword
     - durationcheck
+    - embeddedstructfieldcheck
     - err113
     - errchkjson
     - errname
@@ -22,6 +23,7 @@ linters:
     - exptostd
     - fatcontext
     - forcetypeassert
+    - funcorder
     - ginkgolinter
     - gocheckcompilerdirectives
     - gochecknoinits
@@ -81,6 +83,7 @@ linters:
     - whitespace
     - zerologlint
   disable:
+    - arangolint
     - cyclop
     - depguard
     - exhaustruct
@@ -96,11 +99,13 @@ linters:
     - mnd
     - nestif
     - nlreturn
+    - noinlineerr
     - paralleltest
     - testpackage
     - varnamelen
     - wrapcheck
     - wsl
+    - wsl_v5
   exclusions:
     generated: lax
     presets:
