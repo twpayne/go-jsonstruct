@@ -26,7 +26,7 @@ var (
 	stringTags               = pflag.Bool("string-tags", false, "generate ,string tags")
 	structTagName            = pflag.String("struct-tag-name", "", "struct tag name")
 	typeComment              = pflag.String("type-comment", "", "type comment")
-	typeName                 = pflag.String("typename", "T", "type name")
+	typeName                 = pflag.String("type-name", "T", "type name")
 	intType                  = pflag.String("int-type", "", "integer type")
 	useJSONNumber            = pflag.Bool("use-json-number", false, "use json.Number")
 	goFormat                 = pflag.Bool("go-format", true, "format generated Go code")

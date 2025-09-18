@@ -122,7 +122,7 @@ which you can try by running
 echo '{"nested":{"bar":true,"foo":"baz"}}' \
     '{"nested":{"bar":false,"foo":null}}' \
     '{"nested":{"bar":true,"foo":""}}' \
-    | gojsonstruct --package-name mypackage --typename MyType
+    | gojsonstruct --package-name mypackage --type-name MyType
 ```
 
 generates the output
