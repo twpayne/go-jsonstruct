@@ -1,6 +1,8 @@
 module github.com/twpayne/go-jsonstruct/v3
 
-go 1.22
+go 1.24
+
+tool github.com/twpayne/go-jsonstruct/v3/cmd/gojsonstruct
 
 require (
 	github.com/alecthomas/assert/v2 v2.6.0
