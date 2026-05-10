@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"maps"
+	"slices"
 	"strings"
 	"time"
 
@@ -273,10 +275,9 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 			}
 		}
 		b := &bytes.Buffer{}
-		properties := sortedKeys(v.objectProperties)
 		fmt.Fprintf(b, "struct {\n")
 		var unparsableProperties []string
-		for _, property := range properties {
+		for _, property := range slices.Sorted(maps.Keys(v.objectProperties)) {
 			if isUnparsableProperty(property) {
 				unparsableProperties = append(unparsableProperties, property)
 				continue

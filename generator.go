@@ -9,6 +9,7 @@ import (
 	"io"
 	"maps"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/goccy/go-yaml"
@@ -264,9 +265,8 @@ func (g *Generator) Generate() ([]byte, error) {
 		useJSONNumber:            g.useJSONNumber,
 	})
 	if len(imports) > 0 {
-		importsSlice := sortedKeys(imports)
 		fmt.Fprintf(buffer, "import (\n")
-		for _, _import := range importsSlice {
+		for _, _import := range slices.Sorted(maps.Keys(imports)) {
 			fmt.Fprintf(buffer, "\"%s\"\n", _import)
 		}
 		fmt.Fprintf(buffer, ")\n")

@@ -1,6 +1,8 @@
 package jsonstruct
 
 import (
+	"maps"
+	"slices"
 	"testing"
 
 	"github.com/alecthomas/assert/v2"
@@ -22,7 +24,7 @@ func TestDefaultExportNameFunc(t *testing.T) {
 		"123":              "_123",
 		"A|B":              "A_B",
 	}
-	for _, name := range sortedKeys(expected) {
+	for _, name := range slices.Sorted(maps.Keys(expected)) {
 		t.Run(name, func(t *testing.T) {
 			assert.Equal(t, expected[name], DefaultExportNameFunc(name, defaultAbbreviations))
 		})
