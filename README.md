@@ -4,14 +4,6 @@
 
 Generate Go structs from multiple JSON or YAML objects.
 
-- [go-jsonstruct](#go-jsonstruct)
-  - [What does go-jsonstruct do and why should I use it?](#what-does-go-jsonstruct-do-and-why-should-i-use-it)
-  - [How do I use go-jsonstruct?](#how-do-i-use-go-jsonstruct)
-  - [YAML support](#yaml-support)
-  - [What are go-jsonstruct's key features?](#what-are-go-jsonstructs-key-features)
-  - [How does go-jsonstruct work?](#how-does-go-jsonstruct-work)
-  - [License](#license)
-
 ## What does go-jsonstruct do and why should I use it?
 
 go-jsonstruct generates Go structs from *multiple* JSON or YAML objects.
