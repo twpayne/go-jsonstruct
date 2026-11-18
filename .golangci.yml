@@ -29,6 +29,7 @@ linters:
     - gochecknoinits
     - gochecksumtype
     - gocritic
+    - godoclint
     - godot
     - goheader
     - gomoddirectives
@@ -90,7 +91,7 @@ linters:
     - clickhouselint
     - cyclop
     - depguard
-    - exhaustruct
+    - exhaustruct_v5
     - forbidigo
     - funlen
     - gochecknoglobals
@@ -142,7 +143,10 @@ formatters:
         - prefix(github.com/twpayne/go-jsonstruct)
     gofumpt:
       module-path: github.com/twpayne/go-jsonstruct
-      extra-rules: true
+      extra:
+        balance-calls: true
+        clothe-returns: true
+        group-params: true
     goimports:
       local-prefixes:
         - github.com/twpayne/go-jsonstruct
