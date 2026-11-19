@@ -996,6 +996,20 @@ func TestObserveJSONGoCode(t *testing.T) {
 				"type T any\n",
 		},
 		{
+			name: "duplicate_field_names",
+			json: "" +
+				`{"+1":1,"-1":2,"id":3,"ID":4}`,
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\t_1   int `json:\"+1\"`\n" +
+				"\t_1_2 int `json:\"-1\"`\n" +
+				"\tID   int `json:\"ID\"`\n" +
+				"\tID2  int `json:\"id\"`\n" +
+				"}\n",
+		},
+		{
 			name: "bool",
 			json: "" +
 				`true`,

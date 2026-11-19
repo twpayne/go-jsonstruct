@@ -6,8 +6,11 @@ import (
 	"fmt"
 	"maps"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/fatih/structtag"
 )
@@ -277,6 +280,7 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 		b := &bytes.Buffer{}
 		fmt.Fprintf(b, "struct {\n")
 		var unparsableProperties []string
+		fieldNames := make(map[string]struct{})
 		for _, property := range slices.Sorted(maps.Keys(v.objectProperties)) {
 			if isUnparsableProperty(property) {
 				unparsableProperties = append(unparsableProperties, property)
@@ -322,7 +326,7 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 				_ = tags.Set(tag)
 			}
 
-			fmt.Fprintf(b, "%s %s `%s`\n", options.exportNameFunc(property), goType.typeStr, tags)
+			fmt.Fprintf(b, "%s %s `%s`\n", uniqueFieldName(options.exportNameFunc(property), fieldNames), goType.typeStr, tags)
 		}
 		for _, property := range unparsableProperties {
 			fmt.Fprintf(b, "// %q cannot be unmarshalled into a struct field by encoding/json.\n", property)
@@ -402,4 +406,23 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 			omitEmpty: v.arrays+v.bools+v.float64s+v.ints+v.nulls+v.objects+v.strings < observations,
 		}
 	}
+}
+
+// uniqueFieldName returns name, or name with a numeric suffix if another field
+// of the same struct already uses it (e.g. JSON keys "+1" and "-1", or "id" and
+// "ID").
+func uniqueFieldName(name string, fieldNames map[string]struct{}) string {
+	separator := ""
+	if r, _ := utf8.DecodeLastRuneInString(name); unicode.IsDigit(r) {
+		separator = "_"
+	}
+	unique := name
+	for i := 2; ; i++ {
+		if _, ok := fieldNames[unique]; !ok {
+			break
+		}
+		unique = name + separator + strconv.Itoa(i)
+	}
+	fieldNames[unique] = struct{}{}
+	return unique
 }
