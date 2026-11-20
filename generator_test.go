@@ -608,7 +608,7 @@ func TestGoType(t *testing.T) {
 					bools:        1,
 				},
 			},
-			expectedGoTypeStr: "struct {\n// \"key with spaces\" cannot be unmarshalled into a struct field by encoding/json.\n}",
+			expectedGoTypeStr: "struct {\n// \"key with spaces\" cannot be unmarshaled into a struct field by encoding/json.\n}",
 		},
 		{
 			name: "object_unparsable_properties",

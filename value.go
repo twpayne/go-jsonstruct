@@ -359,7 +359,7 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 			fmt.Fprintf(b, "%s %s `%s`\n", deduplicatedExportNames[property], goType.typeStr, tags)
 		}
 		for _, property := range unparsableProperties {
-			fmt.Fprintf(b, "// %q cannot be unmarshalled into a struct field by encoding/json.\n", property)
+			fmt.Fprintf(b, "// %q cannot be unmarshaled into a struct field by encoding/json.\n", property)
 		}
 		fmt.Fprintf(b, "}")
 		switch {
