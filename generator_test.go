@@ -1390,6 +1390,29 @@ func TestObserveJSONGoCode(t *testing.T) {
 				"\tZeroBool bool `json:\"zeroBool,omitzero\"`\n" +
 				"}\n",
 		},
+		{
+			name: "multiple_duplicate_case_sensitive_fields",
+			json: `{"field":1,"Field":2,"FIELD":3}`,
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\tField1 int `json:\"FIELD\"`\n" +
+				"\tField2 int `json:\"Field\"`\n" +
+				"\tField3 int `json:\"field\"`\n" +
+				"}\n",
+		},
+		{
+			name: "multiple_duplicate_case_sensitive_fields_with_trailing_digits",
+			json: `{"id1":1,"ID1":2}`,
+			expectedGoCodeStr: "" +
+				"package main\n" +
+				"\n" +
+				"type T struct {\n" +
+				"\tID1_1 int `json:\"ID1\"`\n" +
+				"\tID1_2 int `json:\"id1\"`\n" +
+				"}\n",
+		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.skip != "" {
