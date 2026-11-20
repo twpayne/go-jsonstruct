@@ -54,6 +54,7 @@ type Generator struct {
 	skipUnparsableProperties bool
 	stringTags               bool
 	structTagNames           []string
+	symbolNames              map[rune]string
 	typeComment              string
 	typeName                 string
 	useJSONNumber            bool
@@ -174,6 +175,13 @@ func WithStructTagNames(structTagNames []string) GeneratorOption {
 	}
 }
 
+// WithSymbolNames sets the symbol names.
+func WithSymbolNames(symbolNames map[rune]string) GeneratorOption {
+	return func(g *Generator) {
+		g.symbolNames = symbolNames
+	}
+}
+
 // WithAddStructTagName adds a struct tag name.
 func WithAddStructTagName(structTagName string) GeneratorOption {
 	return func(g *Generator) {
@@ -225,6 +233,7 @@ func NewGenerator(options ...GeneratorOption) *Generator {
 		packageName:              "main",
 		skipUnparsableProperties: true,
 		structTagNames:           []string{"json"},
+		symbolNames:              defaultSymbolNames,
 		typeName:                 "T",
 		useJSONNumber:            false,
 		value:                    &value{},
@@ -233,7 +242,7 @@ func NewGenerator(options ...GeneratorOption) *Generator {
 		if rename, ok := g.exportRenames[name]; ok {
 			return rename
 		}
-		return DefaultExportNameFunc(name, g.abbreviations)
+		return DefaultExportNameFunc(name, g.abbreviations, g.symbolNames)
 	}
 	for _, option := range options {
 		option(g)

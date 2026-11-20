@@ -23,10 +23,11 @@ func TestDefaultExportNameFunc(t *testing.T) {
 		"user_acls":        "UserACLs",
 		"123":              "_123",
 		"A|B":              "A_B",
+		"+1":               "Plus1",
 	}
 	for _, name := range slices.Sorted(maps.Keys(expected)) {
 		t.Run(name, func(t *testing.T) {
-			assert.Equal(t, expected[name], DefaultExportNameFunc(name, defaultAbbreviations))
+			assert.Equal(t, expected[name], DefaultExportNameFunc(name, defaultAbbreviations, defaultSymbolNames))
 		})
 	}
 }

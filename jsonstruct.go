@@ -26,10 +26,44 @@ var (
 		"XML":   true,
 		"YAML":  true,
 	}
+
+	defaultSymbolNames = map[rune]string{
+		'`':  "BackQuote",
+		'~':  "Tilde",
+		'!':  "Bang",
+		'@':  "At",
+		'#':  "Hash",
+		'$':  "Dollar",
+		'%':  "Percent",
+		'^':  "Caret",
+		'&':  "Ampersand",
+		'*':  "Star",
+		'(':  "OpenBracket",
+		')':  "CloseBracket",
+		'-':  "Minus",
+		'_':  "Underscore",
+		'+':  "Plus",
+		'=':  "Equals",
+		'[':  "OpenSquareBracket",
+		']':  "CloseSquareBracket",
+		'{':  "OpenCurlyBracket",
+		'}':  "CloseCurlyBracket",
+		'|':  "Or",
+		';':  "Semicolon",
+		':':  "Colon",
+		'\'': "Quote",
+		'"':  "DoubleQuote",
+		',':  "Comma",
+		'<':  "LessThan",
+		'>':  "GreaterThan",
+		'.':  "Point",
+		'/':  "Slash",
+		'?':  "Question",
+	}
 )
 
 // DefaultExportNameFunc returns the exported name for name.
-func DefaultExportNameFunc(name string, abbreviations map[string]bool) string {
+func DefaultExportNameFunc(name string, abbreviations map[string]bool, symbolNames map[rune]string) string {
 	components := SplitComponents(name)
 	for i, component := range components {
 		componentUpper := strings.ToUpper(component)
@@ -45,9 +79,18 @@ func DefaultExportNameFunc(name string, abbreviations map[string]bool) string {
 			runes := []rune(component)
 			components[i] = string(runes[0]) + strings.ToLower(string(runes[1:]))
 		default:
-			runes := []rune(component)
-			runes[0] = unicode.ToUpper(runes[0])
-			components[i] = string(runes)
+			var builder strings.Builder
+			builder.Grow(len(component))
+			for i, r := range []rune(component) {
+				if symbolName, ok := symbolNames[r]; ok {
+					builder.WriteString(symbolName)
+				} else if i == 0 {
+					builder.WriteRune(unicode.ToUpper(r))
+				} else {
+					builder.WriteRune(r)
+				}
+			}
+			components[i] = builder.String()
 		}
 	}
 	runes := []rune(strings.Join(components, ""))
