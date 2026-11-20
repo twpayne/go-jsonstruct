@@ -6,8 +6,11 @@ import (
 	"fmt"
 	"maps"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/fatih/structtag"
 )
@@ -274,10 +277,41 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 				omitEmpty: v.objects+v.nulls < observations,
 			}
 		}
+
+		sortedProperties := slices.Sorted(maps.Keys(v.objectProperties))
+
+		// Find properties that have the same export name.
+		exportNames := make(map[string][]string, len(sortedProperties))
+		for _, property := range sortedProperties {
+			if isUnparsableProperty(property) {
+				continue
+			}
+			exportName := options.exportNameFunc(property)
+			exportNames[exportName] = append(exportNames[exportName], property)
+		}
+
+		// De-duplicate export names.
+		deduplicatedExportNames := make(map[string]string, len(sortedProperties))
+		for exportName, properties := range exportNames {
+			if len(properties) == 1 {
+				property := properties[0]
+				deduplicatedExportNames[property] = exportName
+				continue
+			}
+			separator := ""
+			if r, size := utf8.DecodeLastRuneInString(exportName); size != 0 && unicode.IsDigit(r) {
+				separator = "_"
+			}
+			for i, property := range properties {
+				deduplicatedExportName := exportName + separator + strconv.Itoa(i+1)
+				deduplicatedExportNames[property] = deduplicatedExportName
+			}
+		}
+
 		b := &bytes.Buffer{}
 		fmt.Fprintf(b, "struct {\n")
 		var unparsableProperties []string
-		for _, property := range slices.Sorted(maps.Keys(v.objectProperties)) {
+		for _, property := range sortedProperties {
 			if isUnparsableProperty(property) {
 				unparsableProperties = append(unparsableProperties, property)
 				continue
@@ -322,7 +356,7 @@ func (v *value) goType(observations int, options *generateOptions) goType {
 				_ = tags.Set(tag)
 			}
 
-			fmt.Fprintf(b, "%s %s `%s`\n", options.exportNameFunc(property), goType.typeStr, tags)
+			fmt.Fprintf(b, "%s %s `%s`\n", deduplicatedExportNames[property], goType.typeStr, tags)
 		}
 		for _, property := range unparsableProperties {
 			fmt.Fprintf(b, "// %q cannot be unmarshalled into a struct field by encoding/json.\n", property)
